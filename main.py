@@ -5,6 +5,7 @@ Some code in this file is licensed under the Apache License, Version 2.0.
 
 from irc.bot import SingleServerIRCBot
 from requests import get
+from lib import cmds
 import keys
 
 NAME = "nullconstpointerbot"
@@ -45,6 +46,9 @@ class Bot(SingleServerIRCBot):
         tags = {kvpair["key"]: kvpair["value"] for kvpair in event.tags}
         user = {"name": tags["display-name"], "id": tags["user-id"]}
         message = event.arguments[0]
+
+        if user["name"] != NAME:
+            cmds.process(bot, user, message)
 
         print(f"Message from {user['name']}: {message}")
 
