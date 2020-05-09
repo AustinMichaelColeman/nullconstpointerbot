@@ -5,8 +5,10 @@ Twitch chat bot
 
 To use this bot, make a keys.py and put your credentials in it:
 
+```python
 CLIENT_ID = "insertClientIDHere"
 TOKEN = "insertTokenHere"
+```
 
 CLIENT_ID comes from your twitch application. Go to https://dev.twitch.tv/console/apps and then manage or create your app. Then copy the Client ID.
 
