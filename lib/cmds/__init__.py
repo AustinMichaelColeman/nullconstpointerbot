@@ -4,9 +4,7 @@ from . import misc
 
 PREFIX = "!"
 
-cmds = {
-    "hello": misc.hello,
-}
+cmds = {"hello": misc.hello, "friendcode": misc.friendcode}
 
 
 def process(bot, user, message):
