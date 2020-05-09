@@ -1,0 +1,2 @@
+# nullconstpointerbot
+Twitch chat bot
