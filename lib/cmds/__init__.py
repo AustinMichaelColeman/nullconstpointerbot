@@ -23,5 +23,5 @@ def perform(bot, user, cmd, *args):
     if cmd == "help":
         misc.help(bot, PREFIX, cmds)
 
-    else:
-        bot.send_message(f"{user['name']}, \"{cmd}\" isn't a registered command.")
+    # else:
+    #     bot.send_message(f"{user['name']}, \"{cmd}\" isn't a registered command.")
