@@ -3,9 +3,11 @@ Levels notes:
 A level has a level code
 
 A user has zero or more levels
+    A user can queue up levels
 A user can be an owner
 A user can be a moderator
 A user has requests
+
 
 
 A processor has one or more users
