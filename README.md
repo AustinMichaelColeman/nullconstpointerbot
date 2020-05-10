@@ -15,3 +15,5 @@ CLIENT_ID comes from your twitch application. Go to https://dev.twitch.tv/consol
 TOKEN comes from https://twitchapps.com/tmi/ with "oauth:" removed.
 
 See https://dev.twitch.tv/docs/irc for more information
+
+Then run main.py
