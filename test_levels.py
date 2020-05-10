@@ -2,7 +2,7 @@ import unittest
 from lib.levels import levels
 
 
-class TestUserLevelQueue(unittest.TestCase):
+class TestLevels(unittest.TestCase):
     def test_level_queue_empty(self):
         levels_instance = levels.Levels()
 
