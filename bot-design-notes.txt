@@ -5,13 +5,11 @@ A level has a level code
 A user has zero or more levels
 A user can be an owner
 A user can be a moderator
+A user has requests
 
-A user can create an AddLevelRequest and give it to a bot
 
-
-A bot has one or more users
-A bot has one or more requests from users
-A bot handles AddLevelRequests from users
+A processor has one or more users
+A processor can handle users' requests
     if user is an owner/mod:
         handle request, print request success
     else
