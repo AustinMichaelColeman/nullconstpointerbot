@@ -1,12 +1,12 @@
 import unittest
-from lib.levels import levels
+from lib.nullconstpointer import level
 
 
 class TestLevels(unittest.TestCase):
-    def test_level_queue_empty(self):
-        levels_instance = levels.Levels()
+    def test_level_code_empty(self):
+        levelinst = level.Level()
 
-        self.assertEqual(levels_instance.empty(), True)
+        self.assertEqual(levelinst.code(), "")
 
 
 if __name__ == "__main__":
