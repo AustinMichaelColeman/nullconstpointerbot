@@ -21,3 +21,7 @@ def add(bot, chatuser, *args):
     theuser = user.User(chatuser["name"], "xxx-xxx-xxx")
     response = cmdprocessor.add_user(theuser)
     bot.send_message(response)
+
+
+def github(bot, chatuser, *args):
+    bot.send_message("https://github.com/AustinMichaelColeman/nullconstpointerbot")
