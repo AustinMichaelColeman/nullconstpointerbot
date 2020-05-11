@@ -91,8 +91,10 @@ class Bot(SingleServerIRCBot):
 
     def add(self, chatuser, *args):
         cmdprocessor = processor.Processor()
-        theuser = user.User(chatuser["name"], "xxx-xxx-xxx")
-        response = cmdprocessor.add_user(theuser)
+        if len(args) != 1:
+            response = chatuser["name"] + ", please provide a valid level code."
+        else:
+            response = cmdprocessor.add_user_level(chatuser["name"], args[0])
         self.send_message(response)
 
     def github(self, chatuser, *args):

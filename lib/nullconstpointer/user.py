@@ -5,7 +5,7 @@ MOD_LEVEL_USER = 2
 
 class User:
     def __init__(self, name, level, modlevel=MOD_LEVEL_USER):
-        self.name = name
+        self.username = name
         self.levels = [level]
         self.modlevel = modlevel
 
@@ -15,6 +15,11 @@ class User:
     def next_level(self):
         if len(self.levels) > 0:
             return self.levels[0]
+        return None
+
+    def last_level(self):
+        if len(self.levels) > 0:
+            return self.levels[len(self.levels) - 1]
         return None
 
     def remove_level(self):
