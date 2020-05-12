@@ -1,5 +1,5 @@
 # nullconstpointerbot
-Twitch chat bot
+Twitch Mario Maker 2 level chat bot
 
 # Twitch authentication
 
