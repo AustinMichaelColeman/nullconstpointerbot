@@ -48,6 +48,11 @@ class TestUsers(unittest.TestCase):
         theuser = user.User("moderator", thelevel, user.MOD_LEVEL_USER)
         self.assertEqual(theuser.mod_level(), user.MOD_LEVEL_USER)
 
+    def test_user_has_user_name(self):
+        thelevel = level.Level("abc-def-ghd")
+        theuser = user.User("userA", thelevel)
+        self.assertEqual(theuser.username, "userA")
+
 
 if __name__ == "__main__":
     unittest.main()
