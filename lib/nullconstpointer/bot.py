@@ -23,6 +23,7 @@ class Bot(SingleServerIRCBot):
             "friendcode": self.friendcode,
             "add": self.add,
             "github": self.github,
+            "list": self.list_levels,
         }
 
         url = f"https://api.twitch.tv/kraken/users?login={self.USERNAME}"
@@ -69,11 +70,11 @@ class Bot(SingleServerIRCBot):
 
     def perform(self, user, cmd, *args):
         for name, func in self.cmds.items():
-            if cmd == name:
+            if cmd.upper() == name.upper():
                 func(user, *args)
                 return
 
-        if cmd == "help":
+        if cmd.upper() == "HELP":
             self.help(self.prefix, self.cmds)
 
         # else:
@@ -96,6 +97,10 @@ class Bot(SingleServerIRCBot):
             response = chatuser["name"] + ", please provide a valid level code."
         else:
             response = self.cmdprocessor.add_user_level(chatuser["name"], args[0])
+        self.send_message(response)
+
+    def list_levels(self, chatuser, *args):
+        response = self.cmdprocessor.list_levels()
         self.send_message(response)
 
     def github(self, chatuser, *args):

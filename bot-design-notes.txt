@@ -51,6 +51,7 @@ A request has a success and fail message:
         success: userA, your level abc-def-ghi is up!
         fail: EmptyLevelsError: There are no more levels.
     ListLevelsRequest:
+        userA: !list
         success: userA - FOO-BAR-BAZ | userB - ABC-DEF-GHI ... repeated
         fail: EmptyLevelsError: There are no levels.
     ClearLevelsRequest:

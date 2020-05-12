@@ -13,7 +13,9 @@ class TestProcessor(unittest.TestCase):
 
         response = test_processor.add_user_level("userA", "abc-def-ghd")
 
-        self.assertEqual(response, test_processor.success("userA", "ABC-DEF-GHD"))
+        self.assertEqual(
+            response, test_processor.success_add_user_level("userA", "ABC-DEF-GHD")
+        )
 
     def test_add_user_level_multiple_duplicate_levels_fails(self):
         test_processor = processor.Processor()
@@ -31,7 +33,7 @@ class TestProcessor(unittest.TestCase):
         test_processor.add_user_level("userA", "abc-def-ghd")
         response = test_processor.add_user_level("userA", "abc-def-gha")
         self.assertEqual(
-            response, test_processor.success("userA", "ABC-DEF-GHA"),
+            response, test_processor.success_add_user_level("userA", "ABC-DEF-GHA"),
         )
 
     def test_add_user_level_response_invalid(self):
@@ -39,8 +41,23 @@ class TestProcessor(unittest.TestCase):
 
         response = test_processor.add_user_level("userA", "abc-def-gh")
         self.assertEqual(
-            response, test_processor.fail_invalid_code("userA", "abc-def-gh")
+            response,
+            test_processor.fail_add_user_level_invalid_code("userA", "abc-def-gh"),
         )
+
+    def test_list_levels_empty(self):
+        test_processor = processor.Processor()
+
+        response = test_processor.list_levels()
+        self.assertEqual(response, test_processor.success_list_empty())
+
+    def test_list_levels_one_user_one_level(self):
+        test_processor = processor.Processor()
+
+        test_processor.add_user_level("userA", "abc-def-gha")
+        test_processor.add_user_level("userA", "abc-def-ghb")
+        response = test_processor.list_levels()
+        self.assertEqual(response, test_processor.success_list(test_processor.users))
 
 
 if __name__ == "__main__":
