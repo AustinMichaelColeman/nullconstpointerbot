@@ -14,7 +14,7 @@ class TestUsers(unittest.TestCase):
     def test_user_level_is_formatted(self):
         thelevel = level.Level("xxx-xxx-xxx")
         theuser = user.User("userA", thelevel)
-        self.assertEqual(theuser.next_level().code(), "XXX-XXX-XXX")
+        self.assertEqual(str(theuser.next_level()), "XXX-XXX-XXX")
 
     def test_user_can_remove_level(self):
         thelevel = level.Level("xxx-xxx-xxx")
@@ -28,9 +28,9 @@ class TestUsers(unittest.TestCase):
         levelTwo = level.Level("aaa-bbb-ccc")
         theuser.add_level(levelTwo)
 
-        self.assertEqual(theuser.next_level().code(), levelOne.code())
+        self.assertEqual(str(theuser.next_level()), str(levelOne))
         theuser.remove_level()
-        self.assertEqual(theuser.next_level().code(), levelTwo.code())
+        self.assertEqual(str(theuser.next_level()), str(levelTwo))
         theuser.remove_level()
         self.assertEqual(theuser.next_level(), None)
 

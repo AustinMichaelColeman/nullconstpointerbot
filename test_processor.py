@@ -21,7 +21,9 @@ class TestProcessor(unittest.TestCase):
         test_processor = processor.Processor()
 
         response = test_processor.add_user_level("userA", "abc-def-gh")
-        self.assertEqual(response, "Invalid level code: abc-def-gh")
+        self.assertEqual(
+            response, "userA has entered an invalid level code: abc-def-gh"
+        )
 
 
 if __name__ == "__main__":

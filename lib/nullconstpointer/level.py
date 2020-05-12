@@ -5,7 +5,7 @@ class Level:
     def __init__(self, level):
         self.level_code = self.validate(level)
 
-    def code(self):
+    def __str__(self):
         return self.level_code
 
     def validate(self, level):
