@@ -53,6 +53,13 @@ class TestUsers(unittest.TestCase):
         theuser = user.User("userA", thelevel)
         self.assertEqual(theuser.username, "userA")
 
+    def test_user_has_level_works(self):
+        thelevel = level.Level("abc-def-ghd")
+        theuser = user.User("userA", thelevel)
+        does_not_have_level = level.Level("abc-def-ghh")
+        self.assertEqual(theuser.has_level(thelevel), True)
+        self.assertEqual(theuser.has_level(does_not_have_level), False)
+
 
 if __name__ == "__main__":
     unittest.main()

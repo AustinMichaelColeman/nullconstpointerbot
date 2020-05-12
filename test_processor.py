@@ -13,8 +13,25 @@ class TestProcessor(unittest.TestCase):
 
         response = test_processor.add_user_level("userA", "abc-def-ghd")
 
+        self.assertEqual(response, test_processor.success("userA", "ABC-DEF-GHD"))
+
+    def test_add_user_level_multiple_duplicate_levels_fails(self):
+        test_processor = processor.Processor()
+
+        test_processor.add_user_level("userA", "abc-def-ghd")
+        response = test_processor.add_user_level("userA", "abc-def-ghd")
         self.assertEqual(
-            response, "Thank you userA, your level ABC-DEF-GHD has been added."
+            response,
+            test_processor.fail_duplicate_code("userA", "ABC-DEF-GHD", "userA"),
+        )
+
+    def test_add_user_level_multiple_different_levels_succeeds(self):
+        test_processor = processor.Processor()
+
+        test_processor.add_user_level("userA", "abc-def-ghd")
+        response = test_processor.add_user_level("userA", "abc-def-gha")
+        self.assertEqual(
+            response, test_processor.success("userA", "ABC-DEF-GHA"),
         )
 
     def test_add_user_level_response_invalid(self):
@@ -22,7 +39,7 @@ class TestProcessor(unittest.TestCase):
 
         response = test_processor.add_user_level("userA", "abc-def-gh")
         self.assertEqual(
-            response, "userA has entered an invalid level code: abc-def-gh"
+            response, test_processor.fail_invalid_code("userA", "abc-def-gh")
         )
 
 

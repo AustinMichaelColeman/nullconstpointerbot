@@ -30,3 +30,9 @@ class User:
 
     def mod_level(self):
         return self.modlevel
+
+    def has_level(self, levelcode):
+        for level in self.levels:
+            if str(level) == str(levelcode):
+                return True
+        return False

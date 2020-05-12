@@ -33,6 +33,8 @@ class Bot(SingleServerIRCBot):
         resp = get(url, headers=headers).json()
         self.channel_id = resp["users"][0]["_id"]
 
+        self.cmdprocessor = processor.Processor()
+
         super().__init__(
             [(self.HOST, self.PORT, f"oauth:{self.TOKEN}")],
             self.USERNAME,
@@ -90,11 +92,10 @@ class Bot(SingleServerIRCBot):
         self.send_message(f"Add me on your switch! My friend code is SW-2444-3895-1309")
 
     def add(self, chatuser, *args):
-        cmdprocessor = processor.Processor()
         if len(args) != 1:
             response = chatuser["name"] + ", please provide a valid level code."
         else:
-            response = cmdprocessor.add_user_level(chatuser["name"], args[0])
+            response = self.cmdprocessor.add_user_level(chatuser["name"], args[0])
         self.send_message(response)
 
     def github(self, chatuser, *args):
