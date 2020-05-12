@@ -59,6 +59,39 @@ class TestProcessor(unittest.TestCase):
         response = test_processor.list_levels()
         self.assertEqual(response, test_processor.success_list(test_processor.users))
 
+    def test_current_level_is_none(self):
+        test_processor = processor.Processor()
+
+        response = test_processor.get_current_level()
+        self.assertEqual(response, test_processor.fail_current_level_not_selected())
+
+    def test_current_level_success_with_next_level(self):
+        test_processor = processor.Processor()
+
+        test_processor.add_user_level("userA", "abc-def-gha")
+        test_processor.next_level()
+        response = test_processor.get_current_level()
+
+        self.assertEqual(
+            response, test_processor.success_current_level("ABC-DEF-GHA", "userA")
+        )
+
+    def test_next_level_fails_if_no_more_levels(self):
+        test_processor = processor.Processor()
+
+        response = test_processor.next_level()
+
+        self.assertEqual(response, test_processor.fail_next_level_no_more_levels())
+
+    def test_next_level_success(self):
+        test_processor = processor.Processor()
+
+        test_processor.add_user_level("userA", "abc-def-gha")
+        response = test_processor.next_level()
+        self.assertEqual(
+            response, test_processor.success_next_level("ABC-DEF-GHA", "userA")
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

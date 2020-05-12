@@ -24,6 +24,10 @@ class Bot(SingleServerIRCBot):
             "add": self.add,
             "github": self.github,
             "list": self.list_levels,
+            "nextlevel": self.next_level,
+            "next": self.next_level,
+            "current": self.current_level,
+            "currentlevel": self.current_level,
         }
 
         url = f"https://api.twitch.tv/kraken/users?login={self.USERNAME}"
@@ -101,6 +105,14 @@ class Bot(SingleServerIRCBot):
 
     def list_levels(self, chatuser, *args):
         response = self.cmdprocessor.list_levels()
+        self.send_message(response)
+
+    def next_level(self, chatuser, *args):
+        response = self.cmdprocessor.next_level()
+        self.send_message(response)
+
+    def current_level(self, chatuser, *args):
+        response = self.cmdprocessor.get_current_level()
         self.send_message(response)
 
     def github(self, chatuser, *args):

@@ -4,6 +4,8 @@ from . import level, user
 class Processor:
     def __init__(self):
         self.users = []
+        self.current_username = None
+        self.current_level = None
 
     def user_count(self):
         return len(self.users)
@@ -46,6 +48,23 @@ class Processor:
             + username_of_level
         )
 
+    def fail_current_level_not_selected(self):
+        return "No level has been selected yet."
+
+    def success_current_level(self, current_level, theuser):
+        return "The current level is " + current_level + " submitted by " + theuser
+
+    def success_next_level(self, next_level, username):
+        return (
+            "The next level has been selected: "
+            + next_level
+            + " submitted by "
+            + username
+        )
+
+    def fail_next_level_no_more_levels(self):
+        return "There are no more levels to select."
+
     def list_levels(self):
         if len(self.users) == 0:
             return self.success_list_empty()
@@ -77,3 +96,19 @@ class Processor:
             return self.success_add_user_level(
                 foundUser.username, str(foundUser.last_level())
             )
+
+    def get_current_level(self):
+        if self.current_level == None:
+            return self.fail_current_level_not_selected()
+        else:
+            return self.success_current_level(
+                str(self.current_level), self.current_username
+            )
+
+    def next_level(self):
+        if len(self.users) > 0:
+            first_user = self.users[0]
+            self.current_level = first_user.next_level()
+            self.current_username = first_user.username
+            return self.success_next_level(str(self.current_level), first_user.username)
+        return self.fail_next_level_no_more_levels()
