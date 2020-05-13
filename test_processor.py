@@ -109,6 +109,74 @@ class TestProcessor(unittest.TestCase):
 
         self.assertEqual(response, self.test_processor.fail_unmod_not_owner())
 
+    def test_remove_called_without_args(self):
+        response = self.test_processor.remove("userA", "")
+
+        self.assertEqual(response, self.test_processor.fail_remove_no_level_specified())
+
+    def test_remove_called_with_invalid_level_format(self):
+        response = self.test_processor.remove("userA", "abc-def-ghi")
+
+        self.assertEqual(
+            response, self.test_processor.fail_remove_invalid_level_code("abc-def-ghi")
+        )
+
+    def test_remove_level_not_found(self):
+        response = self.test_processor.remove("userA", "abc-def-ghd")
+
+        self.assertEqual(
+            response, self.test_processor.fail_remove_level_not_found("ABC-DEF-GHD"),
+        )
+
+    def test_remove_called_by_user_with_one_level(self):
+        self.test_processor.add_user_level("userA", "abc-def-ghd")
+        response = self.test_processor.remove("userA", "abc-def-ghd")
+
+        self.assertEqual(
+            response,
+            self.test_processor.success_remove_user_level("userA", "ABC-DEF-GHD"),
+        )
+
+    def test_remove_called_by_user_with_two_levels(self):
+        self.test_processor.add_user_level("userA", "abc-def-ghd")
+        self.test_processor.add_user_level("userA", "abc-def-gha")
+        response = self.test_processor.remove("userA", "abc-def-ghd")
+
+        self.assertEqual(
+            response,
+            self.test_processor.success_remove_user_level("userA", "ABC-DEF-GHD"),
+        )
+
+    def test_remove_called_by_mod(self):
+        self.test_processor.mod(self.test_owner.username, "userA")
+        self.test_processor.add_user_level("userB", "abc-def-ghd")
+        response = self.test_processor.remove("userA", "abc-def-ghd")
+
+        self.assertEqual(
+            response,
+            self.test_processor.success_remove_user_level("userB", "ABC-DEF-GHD"),
+        )
+
+    def test_remove_called_by_owner(self):
+        self.test_processor.add_user_level("userB", "abc-def-ghd")
+        response = self.test_processor.remove(str(self.test_owner), "abc-def-ghd")
+
+        self.assertEqual(
+            response,
+            self.test_processor.success_remove_user_level("userB", "ABC-DEF-GHD"),
+        )
+
+    def test_remove_called_by_user_fails(self):
+        self.test_processor.add_user_level("userA", "abc-def-ghd")
+        response = self.test_processor.remove("userB", "abc-def-ghd")
+
+        self.assertEqual(
+            response,
+            self.test_processor.fail_remove_no_permission(
+                "userB", "userA", "ABC-DEF-GHD"
+            ),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

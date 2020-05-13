@@ -99,6 +99,32 @@ class Processor:
     def fail_unmod_not_owner(self):
         return "Only the owner " + self.current_owner.username + " can call !mod"
 
+    def fail_remove_no_level_specified(self):
+        return "Remove failed: no level specified."
+
+    def fail_remove_invalid_level_code(self, invalid_level_code):
+        return "Remove failed: invalid level code: " + invalid_level_code
+
+    def success_remove_user_level(self, user_submitted_by, level_removed):
+        return (
+            "Successfully removed level "
+            + level_removed
+            + " submitted by "
+            + user_submitted_by
+        )
+
+    def fail_remove_level_not_found(self, level_not_found):
+        return "Remove failed: could not find level " + level_not_found
+
+    def fail_remove_no_permission(self, caller_name, level_submitter_name, level_code):
+        return (
+            caller_name
+            + " does not have permission to remove "
+            + level_code
+            + " submitted by "
+            + level_submitter_name
+        )
+
     def list_levels(self):
         if not self.find_first_user_with_level():
             return self.success_list_empty()
@@ -182,3 +208,30 @@ class Processor:
                     return self.success_unmod(theuser.username)
             return self.fail_unmod_cannot_find_user(user_to_unmod)
         return self.fail_unmod_not_owner()
+
+    def is_mod_or_owner(self, username):
+        for theuser in self.users:
+            if theuser.username == username:
+                return theuser.is_mod_or_owner()
+        return False
+
+    def remove(self, caller_name, level_to_remove):
+        if level_to_remove == "":
+            return self.fail_remove_no_level_specified()
+        level_to_remove_formatted = level.Level(level_to_remove)
+        if str(level_to_remove_formatted) == "":
+            return self.fail_remove_invalid_level_code(level_to_remove)
+
+        for theuser in self.users:
+            for thelevel in theuser.levels:
+                if str(thelevel) == str(level_to_remove_formatted):
+                    if self.is_mod_or_owner(caller_name) or caller_name == str(theuser):
+                        theuser.levels.remove(thelevel)
+                        return self.success_remove_user_level(
+                            str(theuser), str(thelevel)
+                        )
+                    else:
+                        return self.fail_remove_no_permission(
+                            caller_name, str(theuser), str(thelevel)
+                        )
+        return self.fail_remove_level_not_found(str(level_to_remove_formatted))

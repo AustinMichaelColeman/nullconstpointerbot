@@ -31,6 +31,7 @@ class Bot(SingleServerIRCBot):
             "currentlevel": self.current_level,
             "mod": self.mod,
             "unmod": self.unmod,
+            "remove": self.remove,
         }
 
         url = f"https://api.twitch.tv/kraken/users?login={self.USERNAME}"
@@ -120,31 +121,39 @@ class Bot(SingleServerIRCBot):
 
     def mod(self, chatuser, *args):
         username = chatuser["name"]
-        user_to_mod = args[0]
         if username == self.bot_owner.username:
             if len(args) != 1:
-                response = (
-                    chatuser["name"] + ", please provide a valid username to mod."
+                self.send_message(
+                    chatuser["name"] + ", please provide a valid user to mod."
                 )
             else:
-                response = self.cmdprocessor.mod(username, user_to_mod)
+                user_to_mod = args[0]
+                self.send_message(self.cmdprocessor.mod(username, user_to_mod))
         else:
-            response = username + ", you do not have permission to mod."
-        self.send_message(response)
+            self.send_message(username + ", you do not have permission to mod.")
 
     def unmod(self, chatuser, *args):
         username = chatuser["name"]
-        user_to_unmod = args[0]
         if username == self.bot_owner.username:
             if len(args) != 1:
-                response = (
-                    chatuser["name"] + ", please provide a valid username to mod."
+                self.send_message(
+                    chatuser["name"] + ", please provide a valid username to unmod."
                 )
             else:
-                response = self.cmdprocessor.unmod(username, user_to_unmod)
+                user_to_unmod = args[0]
+                self.send_message(self.cmdprocessor.unmod(username, user_to_unmod))
         else:
-            response = username + ", you do not have permission to mod."
-        self.send_message(response)
+            self.send_message(username + ", you do not have permission to mod.")
+
+    def remove(self, chatuser, *args):
+        username = chatuser["name"]
+        if len(args) != 1:
+            self.send_message(
+                chatuser["name"]
+                + ", please provide a level code to remove or use !leave"
+            )
+        else:
+            self.send_message(self.cmdprocessor.remove(username, args[0]))
 
     def github(self, chatuser, *args):
         self.send_message("https://github.com/AustinMichaelColeman/nullconstpointerbot")

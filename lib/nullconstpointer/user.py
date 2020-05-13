@@ -51,5 +51,8 @@ class User:
                 return True
         return False
 
+    def is_mod_or_owner(self):
+        return (self.modlevel == MOD_LEVEL_MOD) or (self.modlevel == MOD_LEVEL_OWNER)
+
     def __str__(self):
         return self.username
