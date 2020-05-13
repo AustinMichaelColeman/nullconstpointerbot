@@ -1,11 +1,14 @@
 import unittest
-from lib.nullconstpointer import processor, user, level
+
+from nullconstpointer.processor import Processor
+from nullconstpointer.user import User, MOD_LEVEL_OWNER, MOD_LEVEL_MOD, MOD_LEVEL_USER
+from nullconstpointer.level import Level
 
 
 class TestProcessor(unittest.TestCase):
     def setUp(self):
-        self.test_owner = user.User("test_owner", user.MOD_LEVEL_OWNER)
-        self.test_processor = processor.Processor(self.test_owner)
+        self.test_owner = User("test_owner", MOD_LEVEL_OWNER)
+        self.test_processor = Processor(self.test_owner)
 
     def test_processor_users_equal_to_one(self):
         self.assertEqual(self.test_processor.user_count(), 1)
@@ -75,7 +78,7 @@ class TestProcessor(unittest.TestCase):
 
     def test_next_level_fails_if_not_owner(self):
         self.test_processor.add_user_level("userA", "abc-def-gha")
-        test_user = user.User("userA")
+        test_user = User("userA")
         response = self.test_processor.next_level(test_user)
 
         self.assertEqual(response, self.test_processor.fail_next_level_not_owner())

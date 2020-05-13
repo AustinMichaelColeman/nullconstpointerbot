@@ -1,9 +1,10 @@
-from . import level, user
+from nullconstpointer.level import Level
+from nullconstpointer.user import User, MOD_LEVEL_OWNER, MOD_LEVEL_MOD, MOD_LEVEL_USER
 
 
 class Processor:
     def __init__(self, owner):
-        self.current_owner = user.User(owner.username, user.MOD_LEVEL_OWNER)
+        self.current_owner = User(owner.username, MOD_LEVEL_OWNER)
         self.users = [self.current_owner]
         self.current_username = None
         self.current_level = None
@@ -132,7 +133,7 @@ class Processor:
             return self.success_list(self.users)
 
     def add_user_level(self, username, levelcode):
-        userlevel = level.Level(levelcode)
+        userlevel = Level(levelcode)
         if str(userlevel) == "":
             return self.fail_add_user_level_invalid_code(username, levelcode)
 
@@ -151,7 +152,7 @@ class Processor:
                     )
 
         if not foundUser:
-            foundUser = user.User(username)
+            foundUser = User(username)
             foundUser.add_level(userlevel)
             self.users.append(foundUser)
             return self.success_add_user_level(
@@ -193,7 +194,7 @@ class Processor:
                 if theuser.username == user_to_mod:
                     theuser.make_mod()
                     return self.success_mod(theuser.username)
-            modded_user = user.User(user_to_mod, user.MOD_LEVEL_MOD)
+            modded_user = User(user_to_mod, MOD_LEVEL_MOD)
             self.users.append(modded_user)
             return self.success_mod(modded_user)
         return self.fail_mod_not_owner()
@@ -215,23 +216,24 @@ class Processor:
                 return theuser.is_mod_or_owner()
         return False
 
-    def remove(self, caller_name, level_to_remove):
-        if level_to_remove == "":
+    def remove(self, caller_name, level):
+        if not level:
             return self.fail_remove_no_level_specified()
-        level_to_remove_formatted = level.Level(level_to_remove)
-        if str(level_to_remove_formatted) == "":
-            return self.fail_remove_invalid_level_code(level_to_remove)
 
-        for theuser in self.users:
-            for thelevel in theuser.levels:
-                if str(thelevel) == str(level_to_remove_formatted):
-                    if self.is_mod_or_owner(caller_name) or caller_name == str(theuser):
-                        theuser.levels.remove(thelevel)
-                        return self.success_remove_user_level(
-                            str(theuser), str(thelevel)
-                        )
-                    else:
-                        return self.fail_remove_no_permission(
-                            caller_name, str(theuser), str(thelevel)
-                        )
-        return self.fail_remove_level_not_found(str(level_to_remove_formatted))
+        level_fmt = Level(level)
+        if not str(level_fmt):
+            return self.fail_remove_invalid_level_code(level)
+
+        for user in self.users:
+            for user_level in user.levels:
+                if str(user_level) != str(level_fmt):
+                    continue
+
+                if self.is_mod_or_owner(caller_name) or caller_name == str(user):
+                    user.levels.remove(user_level)
+                    return self.success_remove_user_level(str(user), str(user_level))
+
+                return self.fail_remove_no_permission(
+                    caller_name, str(user), str(user_level)
+                )
+        return self.fail_remove_level_not_found(str(level_fmt))

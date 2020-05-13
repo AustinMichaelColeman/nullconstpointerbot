@@ -4,7 +4,8 @@ Some code in this file is licensed under the Apache License, Version 2.0.
 """
 from irc.bot import SingleServerIRCBot
 from requests import get
-from . import processor, user
+from nullconstpointer.processor import Processor
+from nullconstpointer.user import User, MOD_LEVEL_OWNER, MOD_LEVEL_MOD, MOD_LEVEL_USER
 
 
 class Bot(SingleServerIRCBot):
@@ -17,7 +18,7 @@ class Bot(SingleServerIRCBot):
         self.CHANNEL = f"#{owner}"
         self.botname = botname
         self.prefix = "!"
-        self.bot_owner = user.User(owner, user.MOD_LEVEL_OWNER)
+        self.bot_owner = User(owner, MOD_LEVEL_OWNER)
 
         self.cmds = {
             "hello": self.hello,
@@ -42,7 +43,7 @@ class Bot(SingleServerIRCBot):
         resp = get(url, headers=headers).json()
         self.channel_id = resp["users"][0]["_id"]
 
-        self.cmdprocessor = processor.Processor(self.bot_owner)
+        self.cmdprocessor = Processor(self.bot_owner)
 
         super().__init__(
             [(self.HOST, self.PORT, f"oauth:{self.TOKEN}")],
