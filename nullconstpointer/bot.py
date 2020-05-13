@@ -140,11 +140,11 @@ class Bot(SingleServerIRCBot):
     def remove(self, chatuser, *args):
         username = chatuser["name"]
 
-        if len(args) != 1:
+        if len(args) == 1:
             level_to_remove = args[0]
             self.send_message(self.cmdprocessor.remove(username, level_to_remove))
         else:
-            self.send_message(self.cmdprocessor.remove(username, None)
+            self.send_message(self.cmdprocessor.remove(username, None))
 
     def github(self, chatuser, *args):
         self.send_message("https://github.com/AustinMichaelColeman/nullconstpointerbot")
