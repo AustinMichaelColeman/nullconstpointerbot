@@ -126,6 +126,12 @@ class Processor:
             + level_submitter_name
         )
 
+    def fail_leave_no_levels(self, caller):
+        return caller + " has no levels to remove."
+
+    def success_leave(self, caller):
+        return "Removed all levels submitted by " + caller
+
     def list_levels(self):
         if not self.find_first_user_with_level():
             return self.success_list_empty()
@@ -227,3 +233,13 @@ class Processor:
 
                 return self.fail_remove_no_permission(caller_name, user, user_level)
         return self.fail_remove_level_not_found(level_fmt)
+
+    def leave(self, caller_name):
+        for user in self.users:
+            if user == caller_name:
+                if user.levels:
+                    user.levels.clear()
+                    return self.success_leave(caller_name)
+                else:
+                    return self.fail_leave_no_levels(caller_name)
+        return self.fail_leave_no_levels(caller_name)

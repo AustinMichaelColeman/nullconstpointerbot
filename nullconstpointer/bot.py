@@ -33,6 +33,7 @@ class Bot(SingleServerIRCBot):
             "mod": self.mod,
             "unmod": self.unmod,
             "remove": self.remove,
+            "leave": self.leave,
         }
 
         url = f"https://api.twitch.tv/kraken/users?login={self.USERNAME}"
@@ -158,3 +159,7 @@ class Bot(SingleServerIRCBot):
 
     def github(self, chatuser, *args):
         self.send_message("https://github.com/AustinMichaelColeman/nullconstpointerbot")
+
+    def leave(self, chatuser, *args):
+        username = chatuser["name"]
+        self.send_message(self.cmdprocessor.leave(username))

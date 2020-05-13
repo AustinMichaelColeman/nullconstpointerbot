@@ -180,6 +180,37 @@ class TestProcessor(unittest.TestCase):
             ),
         )
 
+    def test_leave_called_by_user_with_no_levels(self):
+        response = self.test_processor.leave("userA")
+
+        self.assertEqual(response, self.test_processor.fail_leave_no_levels("userA"))
+
+    def test_leave_called_by_user_with_one_level(self):
+        self.test_processor.add_user_level("userA", "abc-def-ghd")
+        response = self.test_processor.leave("userA")
+
+        self.assertEqual(response, self.test_processor.success_leave("userA"))
+
+    def test_leave_called_by_user_with_two_levels(self):
+        self.test_processor.add_user_level("userA", "abc-def-ghd")
+        self.test_processor.add_user_level("userA", "abc-def-gha")
+        response = self.test_processor.leave("userA")
+
+        self.assertEqual(response, self.test_processor.success_leave("userA"))
+
+    def test_leave_called_by_mod_with_no_levels(self):
+        self.test_processor.mod(self.test_owner, "userA")
+        response = self.test_processor.leave("userA")
+
+        self.assertEqual(response, self.test_processor.fail_leave_no_levels("userA"))
+
+    def test_leave_called_by_mod_with_levels(self):
+        self.test_processor.mod(self.test_owner, "userA")
+        self.test_processor.add_user_level("userA", "abc-def-ghd")
+        response = self.test_processor.leave("userA")
+
+        self.assertEqual(response, self.test_processor.success_leave("userA"))
+
 
 if __name__ == "__main__":
     unittest.main()
