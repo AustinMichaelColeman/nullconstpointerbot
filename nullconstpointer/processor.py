@@ -226,7 +226,7 @@ class Processor:
 
         for user in self.users:
             for user_level in user.levels:
-                if str(user_level) != str(level_fmt):
+                if user_level != level:
                     continue
 
                 if self.is_mod_or_owner(caller_name) or caller_name == str(user):

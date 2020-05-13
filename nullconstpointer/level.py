@@ -8,6 +8,9 @@ class Level:
     def __str__(self):
         return self.level_code
 
+    def __eq__(self, other):
+        return self.level_code == other.level_code
+
     def validate(self, level):
         # Text allowed in level codes: 0-9 A-Z a-z except I O Z
         # ignore anything but 0-9, A-Z, a-z, except IiOoZz
