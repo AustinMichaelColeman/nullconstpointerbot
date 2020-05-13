@@ -266,6 +266,50 @@ class TestProcessor(unittest.TestCase):
 
         self.assertEqual(response, self.test_processor.success_leave("userA"))
 
+    def test_clear_called_by_owner_without_levels(self):
+        response = self.test_processor.clear(self.test_owner)
+
+        self.assertEqual(response, self.test_processor.success_clear_owner())
+
+    def test_clear_called_by_owner_with_levels(self):
+        self.test_processor.add_user_level("userA", "123-123-123")
+        self.test_processor.add_user_level("userA", "123-123-124")
+        self.test_processor.add_user_level("userB", "123-123-126")
+        response = self.test_processor.clear(self.test_owner)
+
+        self.assertEqual(response, self.test_processor.success_clear_owner())
+
+    def test_clear_called_by_mod_without_levels(self):
+        self.test_processor.mod(self.test_owner, "userA")
+        response = self.test_processor.clear("userA")
+
+        self.assertEqual(
+            response, self.test_processor.fail_clear_user_no_levels("userA")
+        )
+
+    def test_clear_called_by_mod_with_levels(self):
+        self.test_processor.mod(self.test_owner, "userA")
+        self.test_processor.add_user_level("userA", "123-123-123")
+        response = self.test_processor.clear("userA")
+
+        self.assertEqual(response, self.test_processor.success_clear_user("userA"))
+
+    def test_clear_called_by_user_without_levels(self):
+        response = self.test_processor.clear("userA")
+
+        self.assertEqual(
+            response, self.test_processor.fail_clear_user_no_levels("userA")
+        )
+
+    def test_clear_called_by_user_with_levels(self):
+        self.test_processor.add_user_level("userA", "123-123-123")
+        self.test_processor.add_user_level("userA", "123-123-124")
+        self.test_processor.add_user_level("userB", "123-123-125")
+        response = self.test_processor.clear("userA")
+
+        self.assertEqual(response, self.test_processor.success_clear_user("userA"))
+        self.assertEqual(self.test_processor.level_count(), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

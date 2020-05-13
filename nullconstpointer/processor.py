@@ -12,6 +12,12 @@ class Processor:
     def user_count(self):
         return len(self.users)
 
+    def level_count(self):
+        level_count = 0
+        for user in self.users:
+            level_count += len(user.levels)
+        return level_count
+
     def success_list_empty(self):
         return "There are no levels to list"
 
@@ -135,6 +141,15 @@ class Processor:
     def success_leave(self, caller):
         return "Removed all levels submitted by " + caller
 
+    def success_clear_owner(self):
+        return "Successfully cleared all levels."
+
+    def success_clear_user(self, caller_name):
+        return "Cleared all levels submitted by " + caller_name
+
+    def fail_clear_user_no_levels(self, caller_name):
+        return caller_name + " does not have any levels added."
+
     def list_levels(self):
         if not self.find_first_user_with_level():
             return self.success_list_empty()
@@ -249,3 +264,19 @@ class Processor:
                 else:
                     return self.fail_leave_no_levels(caller_name)
         return self.fail_leave_no_levels(caller_name)
+
+    def clear(self, caller_name):
+        if caller_name == self.current_owner:
+            for user in self.users:
+                user.levels.clear()
+            return self.success_clear_owner()
+
+        for user in self.users:
+            if user != caller_name:
+                continue
+
+            if user.levels:
+                user.levels.clear()
+                return self.success_clear_user(caller_name)
+            return self.fail_clear_user_no_levels(caller_name)
+        return self.fail_clear_user_no_levels(caller_name)
