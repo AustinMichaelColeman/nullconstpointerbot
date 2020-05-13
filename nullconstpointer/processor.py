@@ -185,28 +185,31 @@ class Processor:
             return self.fail_next_level_not_owner()
 
     def mod(self, caller_name, user_to_mod):
+        if caller_name != self.current_owner:
+            return self.fail_mod_not_owner()
         if not user_to_mod:
             return self.fail_mod_none_specified()
-        if caller_name == self.current_owner:
-            for user in self.users:
-                if user == user_to_mod:
-                    user.make_mod()
-                    return self.success_mod(user)
-            modded_user = User(user_to_mod, MOD_LEVEL_MOD)
-            self.users.append(modded_user)
-            return self.success_mod(modded_user)
-        return self.fail_mod_not_owner()
+
+        for user in self.users:
+            if user == user_to_mod:
+                user.make_mod()
+                return self.success_mod(user)
+        modded_user = User(user_to_mod, MOD_LEVEL_MOD)
+        self.users.append(modded_user)
+        return self.success_mod(modded_user)
 
     def unmod(self, caller_name, user_to_unmod):
-        if user_to_unmod == "":
+        if caller_name != self.current_owner:
+            return self.fail_unmod_not_owner()
+
+        if not user_to_unmod:
             return self.fail_unmod_none_specified()
-        if caller_name == self.current_owner:
-            for user in self.users:
-                if user == user_to_unmod:
-                    user.make_user()
-                    return self.success_unmod(user)
-            return self.fail_unmod_cannot_find_user(user_to_unmod)
-        return self.fail_unmod_not_owner()
+
+        for user in self.users:
+            if user == user_to_unmod:
+                user.make_user()
+                return self.success_unmod(user)
+        return self.fail_unmod_cannot_find_user(user_to_unmod)
 
     def is_mod_or_owner(self, username):
         for user in self.users:

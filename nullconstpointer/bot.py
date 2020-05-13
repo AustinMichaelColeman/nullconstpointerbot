@@ -123,29 +123,19 @@ class Bot(SingleServerIRCBot):
 
     def mod(self, chatuser, *args):
         username = chatuser["name"]
-        if username == self.bot_owner.username:
-            if len(args) != 1:
-                self.send_message(
-                    chatuser["name"] + ", please provide a valid user to mod."
-                )
-            else:
-                user_to_mod = args[0]
-                self.send_message(self.cmdprocessor.mod(username, user_to_mod))
+        if len(args) == 1:
+            user_to_mod = args[0]
+            self.send_message(self.cmdprocessor.mod(username, user_to_mod))
         else:
-            self.send_message(username + ", you do not have permission to mod.")
+            self.send_message(self.cmdprocessor.mod(username, None))
 
     def unmod(self, chatuser, *args):
         username = chatuser["name"]
-        if username == self.bot_owner.username:
-            if len(args) != 1:
-                self.send_message(
-                    chatuser["name"] + ", please provide a valid username to unmod."
-                )
-            else:
-                user_to_unmod = args[0]
-                self.send_message(self.cmdprocessor.unmod(username, user_to_unmod))
+        if len(args) == 1:
+            user_to_unmod = args[0]
+            self.send_message(self.cmdprocessor.unmod(username, user_to_unmod))
         else:
-            self.send_message(username + ", you do not have permission to mod.")
+            self.send_message(self.cmdprocessor.unmod(username, None))
 
     def remove(self, chatuser, *args):
         username = chatuser["name"]

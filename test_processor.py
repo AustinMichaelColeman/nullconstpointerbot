@@ -101,6 +101,23 @@ class TestProcessor(unittest.TestCase):
         response = self.test_processor.mod(self.test_owner.username, "")
         self.assertEqual(response, self.test_processor.fail_mod_none_specified())
 
+    def test_mod_fail_when_user_to_mod_none_as_owner(self):
+        response = self.test_processor.mod(self.test_owner, None)
+        self.assertEqual(response, self.test_processor.fail_mod_none_specified())
+
+    def test_mod_fail_when_user_to_mod_none_as_mod(self):
+        self.test_processor.mod(self.test_owner, "userA")
+        response = self.test_processor.mod("userA", None)
+
+        self.assertEqual(response, self.test_processor.fail_mod_not_owner())
+
+    def test_mod_fail_when_user_to_mod_none_as_user(self):
+        self.test_processor.mod(self.test_owner, "userA")
+        self.test_processor.unmod(self.test_owner, "userA")
+
+        response = self.test_processor.mod("userA", None)
+        self.assertEqual(response, self.test_processor.fail_mod_not_owner())
+
     def test_unmod_success(self):
         self.test_processor.mod(self.test_owner.username, "userB")
         response = self.test_processor.unmod(self.test_owner.username, "userB")
@@ -110,6 +127,23 @@ class TestProcessor(unittest.TestCase):
     def test_unmod_fail(self):
         response = self.test_processor.unmod("userB", "userA")
 
+        self.assertEqual(response, self.test_processor.fail_unmod_not_owner())
+
+    def test_unmod_fail_when_user_to_unmod_none_as_owner(self):
+        response = self.test_processor.unmod(self.test_owner, None)
+        self.assertEqual(response, self.test_processor.fail_unmod_none_specified())
+
+    def test_unmod_fail_when_user_to_unmod_none_as_mod(self):
+        self.test_processor.mod(self.test_owner, "userA")
+        response = self.test_processor.unmod("userA", None)
+
+        self.assertEqual(response, self.test_processor.fail_unmod_not_owner())
+
+    def test_unmod_fail_when_user_to_unmod_none_as_user(self):
+        self.test_processor.mod(self.test_owner, "userA")
+        self.test_processor.unmod(self.test_owner, "userA")
+
+        response = self.test_processor.unmod("userA", None)
         self.assertEqual(response, self.test_processor.fail_unmod_not_owner())
 
     def test_remove_called_without_args(self):
