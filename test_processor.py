@@ -310,6 +310,70 @@ class TestProcessor(unittest.TestCase):
         self.assertEqual(response, self.test_processor.success_clear_user("userA"))
         self.assertEqual(self.test_processor.level_count(), 1)
 
+    def test_random_called_by_owner_with_no_levels(self):
+        response = self.test_processor.random_level(self.test_owner)
+
+        self.assertEqual(response, self.test_processor.fail_random_no_levels())
+
+    def test_random_called_by_owner_with_levels(self):
+        self.test_processor.add_user_level("userA", "123-123-123")
+        self.test_processor.add_user_level("userB", "123-123-124")
+        response = self.test_processor.random_level(self.test_owner)
+
+        possible_responses = [
+            self.test_processor.success_random_level("userA", "123-123-123"),
+            self.test_processor.success_random_level("userB", "123-123-124"),
+        ]
+
+        self.assertIn(response, possible_responses)
+
+    def test_random_called_by_owner_first_level_submitted_selected(self):
+        self.test_processor.add_user_level("userA", "123-123-123")
+        self.test_processor.add_user_level("userA", "123-123-121")
+        self.test_processor.add_user_level("userA", "123-123-120")
+        response = self.test_processor.random_level(self.test_owner)
+
+        self.assertEqual(
+            response, self.test_processor.success_random_level("userA", "123-123-123")
+        )
+
+        self.test_processor.remove(self.test_owner, "123-123-123")
+        response = self.test_processor.random_level(self.test_owner)
+
+        self.assertEqual(
+            response, self.test_processor.success_random_level("userA", "123-123-121")
+        )
+
+    def test_random_called_by_owner_first_level_submitted_selected_multi_user(self):
+        self.test_processor.add_user_level("userA", "123-123-121")
+        self.test_processor.add_user_level("userB", "123-123-122")
+        self.test_processor.add_user_level("userB", "123-123-123")
+        self.test_processor.add_user_level("userA", "123-123-124")
+
+        response = self.test_processor.random_level(self.test_owner)
+
+        possible_responses = [
+            self.test_processor.success_random_level("userA", "123-123-121"),
+            self.test_processor.success_random_level("userB", "123-123-122"),
+        ]
+
+        self.assertIn(response, possible_responses)
+
+    def test_random_called_by_mod(self):
+        self.test_processor.mod(self.test_owner, "userA")
+        response = self.test_processor.random_level("userA")
+
+        self.assertEqual(
+            response, self.test_processor.fail_random_no_permission("userA")
+        )
+
+    def test_random_called_by_user(self):
+        response = self.test_processor.random_level("userA")
+
+        self.assertEqual(
+            response, self.test_processor.fail_random_no_permission("userA")
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

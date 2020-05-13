@@ -1,3 +1,6 @@
+import random
+from datetime import datetime
+
 from nullconstpointer.level import Level
 from nullconstpointer.user import User, MOD_LEVEL_OWNER, MOD_LEVEL_MOD, MOD_LEVEL_USER
 
@@ -8,6 +11,7 @@ class Processor:
         self.users = [self.current_owner]
         self.current_user = None
         self.current_level = None
+        random.seed(datetime.now())
 
     def user_count(self):
         return len(self.users)
@@ -150,6 +154,25 @@ class Processor:
     def fail_clear_user_no_levels(self, caller_name):
         return caller_name + " does not have any levels added."
 
+    def success_random_level(self, level_submitter_name, level_code):
+        return (
+            level_submitter_name
+            + ", your level "
+            + level_code
+            + " has been randomly selected!"
+        )
+
+    def fail_random_no_permission(self, caller_name):
+        return (
+            caller_name
+            + ", only the owner "
+            + self.current_owner
+            + " can call !random."
+        )
+
+    def fail_random_no_levels(self):
+        return "There are no levels to select at random."
+
     def list_levels(self):
         if not self.find_first_user_with_level():
             return self.success_list_empty()
@@ -280,3 +303,22 @@ class Processor:
                 return self.success_clear_user(caller_name)
             return self.fail_clear_user_no_levels(caller_name)
         return self.fail_clear_user_no_levels(caller_name)
+
+    def random_level(self, caller_name):
+        if caller_name != self.current_owner:
+            return self.fail_random_no_permission(caller_name)
+
+        users_with_levels = []
+        for user in self.users:
+            if user.has_levels():
+                users_with_levels += user
+
+        if len(users_with_levels) == 0:
+            return self.fail_random_no_levels()
+
+        random_user_index = random.randrange(0, len(users_with_levels))
+        selected_user = users_with_levels[random_user_index]
+
+        self.current_level = selected_user.next_level()
+        self.current_user = selected_user
+        return self.success_random_level(selected_user, self.current_level)

@@ -73,6 +73,15 @@ class TestUsers(unittest.TestCase):
         theuser.make_user()
         self.assertEqual(theuser.modlevel, MOD_LEVEL_USER)
 
+    def test_user_has_levels_empty(self):
+        user = User("userA")
+        self.assertEqual(user.has_levels(), False)
+
+    def test_user_has_levels_with_levels(self):
+        user = User("userA")
+        user.add_level("123-123-123")
+        self.assertEqual(user.has_levels(), True)
+
 
 if __name__ == "__main__":
     unittest.main()

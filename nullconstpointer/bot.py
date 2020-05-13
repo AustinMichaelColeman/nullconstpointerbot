@@ -35,6 +35,7 @@ class Bot(SingleServerIRCBot):
             "remove": self.remove,
             "leave": self.leave,
             "clear": self.clear,
+            "random": self.random,
         }
 
         url = f"https://api.twitch.tv/kraken/users?login={self.USERNAME}"
@@ -157,3 +158,7 @@ class Bot(SingleServerIRCBot):
     def clear(self, chatuser, *args):
         username = chatuser["name"]
         self.send_message(self.cmdprocessor.clear(username))
+
+    def random(self, chatuser, *args):
+        username = chatuser["name"]
+        self.send_message(self.cmdprocessor.random_level(username))

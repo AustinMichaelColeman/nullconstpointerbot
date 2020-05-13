@@ -25,6 +25,10 @@ class User:
         return str(self) + other
 
     def __radd__(self, other):
+        if isinstance(other, list):
+            copy = other
+            copy.append(self)
+            return copy
         return other + str(self)
 
     def __bool__(self):
@@ -66,6 +70,9 @@ class User:
             if level == levelcode:
                 return True
         return False
+
+    def has_levels(self):
+        return len(self.levels) > 0
 
     def is_mod_or_owner(self):
         return (self.modlevel == MOD_LEVEL_MOD) or (self.modlevel == MOD_LEVEL_OWNER)
