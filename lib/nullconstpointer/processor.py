@@ -2,8 +2,9 @@ from . import level, user
 
 
 class Processor:
-    def __init__(self):
-        self.users = []
+    def __init__(self, owner):
+        self.current_owner = user.User(owner.username, user.MOD_LEVEL_OWNER)
+        self.users = [self.current_owner]
         self.current_username = None
         self.current_level = None
 
@@ -65,8 +66,23 @@ class Processor:
     def fail_next_level_no_more_levels(self):
         return "There are no more levels to select."
 
+    def fail_next_level_not_owner(self):
+        return "Next can only be called by the owner: " + self.current_owner.username
+
+    def success_mod(self, user_to_mod):
+        return user_to_mod + " is now a mod!"
+
+    def fail_mod(self, user_to_mod):
+        return "Unable to mod: Could not find " + user_to_mod
+
+    def success_unmod(self, user_to_unmod):
+        return user_to_unmod + " is no longer a mod."
+
+    def fail_unmod(self, user_to_unmod):
+        return "Unable to unmod: Could not find " + user_to_unmod
+
     def list_levels(self):
-        if len(self.users) == 0:
+        if not self.find_first_user_with_level():
             return self.success_list_empty()
         else:
             return self.success_list(self.users)
@@ -91,7 +107,8 @@ class Processor:
                     )
 
         if not foundUser:
-            foundUser = user.User(username, userlevel)
+            foundUser = user.User(username)
+            foundUser.add_level(userlevel)
             self.users.append(foundUser)
             return self.success_add_user_level(
                 foundUser.username, str(foundUser.last_level())
@@ -105,10 +122,35 @@ class Processor:
                 str(self.current_level), self.current_username
             )
 
-    def next_level(self):
-        if len(self.users) > 0:
-            first_user = self.users[0]
-            self.current_level = first_user.next_level()
-            self.current_username = first_user.username
-            return self.success_next_level(str(self.current_level), first_user.username)
-        return self.fail_next_level_no_more_levels()
+    def find_first_user_with_level(self):
+        for theuser in self.users:
+            if len(theuser.levels) > 0:
+                return theuser
+        return None
+
+    def next_level(self, caller_user):
+        if str(caller_user) == self.current_owner.username:
+            found_user = self.find_first_user_with_level()
+            if found_user:
+                self.current_level = found_user.next_level()
+                self.current_username = found_user.username
+                return self.success_next_level(
+                    str(self.current_level), found_user.username
+                )
+            return self.fail_next_level_no_more_levels()
+        else:
+            return self.fail_next_level_not_owner()
+
+    def mod(self, user_to_mod):
+        for theuser in self.users:
+            if theuser.username == user_to_mod:
+                theuser.make_mod()
+                return self.success_mod(theuser.username)
+        return self.fail_mod(user_to_mod)
+
+    def unmod(self, user_to_unmod):
+        for theuser in self.users:
+            if theuser.username == user_to_unmod:
+                theuser.make_user()
+                return self.success_unmod(theuser.username)
+        return self.fail_unmod(user_to_unmod)

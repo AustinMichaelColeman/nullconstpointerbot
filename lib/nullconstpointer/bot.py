@@ -17,6 +17,7 @@ class Bot(SingleServerIRCBot):
         self.CHANNEL = f"#{owner}"
         self.botname = botname
         self.prefix = "!"
+        self.bot_owner = user.User(owner, user.MOD_LEVEL_OWNER)
 
         self.cmds = {
             "hello": self.hello,
@@ -28,6 +29,8 @@ class Bot(SingleServerIRCBot):
             "next": self.next_level,
             "current": self.current_level,
             "currentlevel": self.current_level,
+            "mod": self.mod,
+            "unmod": self.unmod,
         }
 
         url = f"https://api.twitch.tv/kraken/users?login={self.USERNAME}"
@@ -38,7 +41,7 @@ class Bot(SingleServerIRCBot):
         resp = get(url, headers=headers).json()
         self.channel_id = resp["users"][0]["_id"]
 
-        self.cmdprocessor = processor.Processor()
+        self.cmdprocessor = processor.Processor(self.bot_owner)
 
         super().__init__(
             [(self.HOST, self.PORT, f"oauth:{self.TOKEN}")],
@@ -108,12 +111,28 @@ class Bot(SingleServerIRCBot):
         self.send_message(response)
 
     def next_level(self, chatuser, *args):
-        response = self.cmdprocessor.next_level()
+        response = self.cmdprocessor.next_level(chatuser["name"])
         self.send_message(response)
 
     def current_level(self, chatuser, *args):
         response = self.cmdprocessor.get_current_level()
         self.send_message(response)
+
+    def mod(self, chatuser, *args):
+        username = chatuser["name"]
+        if username == self.bot_owner.username:
+            if len(args) != 1:
+                response = (
+                    chatuser["name"] + ", please provide a valid username to mod."
+                )
+            else:
+                response = self.cmdprocessor.mod(args[0])
+        else:
+            response = username + ", you do not have permission to mod."
+        self.send_message(response)
+
+    def unmod(self, chatuser, *args):
+        pass
 
     def github(self, chatuser, *args):
         self.send_message("https://github.com/AustinMichaelColeman/nullconstpointerbot")
