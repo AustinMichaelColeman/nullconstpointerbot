@@ -14,6 +14,22 @@ class User:
             or modlevel == MOD_LEVEL_USER
         )
 
+    def __eq__(self, other):
+        if other == None:
+            return False
+        if isinstance(other, str):
+            return self.username == other
+        return self.username == other.username
+
+    def __add__(self, other):
+        return str(self) + other
+
+    def __radd__(self, other):
+        return other + str(self)
+
+    def __bool__(self):
+        return self.username != ""
+
     def levelCount(self):
         return len(self.levels)
 
@@ -47,7 +63,7 @@ class User:
 
     def has_level(self, levelcode):
         for level in self.levels:
-            if str(level) == str(levelcode):
+            if level == levelcode:
                 return True
         return False
 

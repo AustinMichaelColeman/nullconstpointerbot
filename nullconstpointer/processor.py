@@ -4,9 +4,9 @@ from nullconstpointer.user import User, MOD_LEVEL_OWNER, MOD_LEVEL_MOD, MOD_LEVE
 
 class Processor:
     def __init__(self, owner):
-        self.current_owner = User(owner.username, MOD_LEVEL_OWNER)
+        self.current_owner = owner
         self.users = [self.current_owner]
-        self.current_username = None
+        self.current_user = None
         self.current_level = None
 
     def user_count(self):
@@ -20,17 +20,17 @@ class Processor:
         user_index = 0
 
         users_with_levels = []
-        for theuser in users:
-            if len(theuser.levels) > 0:
-                users_with_levels.append(theuser)
+        for user in users:
+            if len(user.levels) > 0:
+                users_with_levels.append(user)
 
-        for theuser in users_with_levels:
-            output += theuser.username
+        for user in users_with_levels:
+            output += user
             output += " "
             level_index = 0
-            for thelevel in theuser.levels:
-                output += str(thelevel)
-                if level_index < (len(theuser.levels) - 1):
+            for thelevel in user.levels:
+                output += thelevel
+                if level_index < (len(user.levels) - 1):
                     output += ", "
                 level_index += 1
             if user_index < (len(users_with_levels) - 1):
@@ -59,8 +59,8 @@ class Processor:
     def fail_current_level_not_selected(self):
         return "No level has been selected yet."
 
-    def success_current_level(self, current_level, theuser):
-        return "The current level is " + current_level + " submitted by " + theuser
+    def success_current_level(self, current_level, user):
+        return "The current level is " + current_level + " submitted by " + user
 
     def success_next_level(self, next_level, username):
         return (
@@ -74,16 +74,16 @@ class Processor:
         return "There are no more levels to select."
 
     def fail_next_level_not_owner(self):
-        return "Next can only be called by the owner: " + self.current_owner.username
+        return "Next can only be called by the owner: " + self.current_owner
 
     def success_mod(self, user_to_mod):
-        return str(user_to_mod) + " is now a mod!"
+        return user_to_mod + " is now a mod!"
 
     def fail_mod(self, user_to_mod):
         return "Unable to mod: Could not find " + user_to_mod
 
     def fail_mod_not_owner(self):
-        return "Only the owner " + self.current_owner.username + " can call !mod"
+        return "Only the owner " + self.current_owner + " can call !mod"
 
     def fail_mod_none_specified(self):
         return "Unable to mod, please specify a user."
@@ -98,7 +98,7 @@ class Processor:
         return "Unable to unmod, please specify a user."
 
     def fail_unmod_not_owner(self):
-        return "Only the owner " + self.current_owner.username + " can call !mod"
+        return "Only the owner " + self.current_owner + " can call !mod"
 
     def fail_remove_no_level_specified(self):
         return "Remove failed: no level specified."
@@ -134,66 +134,58 @@ class Processor:
 
     def add_user_level(self, username, levelcode):
         userlevel = Level(levelcode)
-        if str(userlevel) == "":
+        if not userlevel:
             return self.fail_add_user_level_invalid_code(username, levelcode)
 
         foundUser = False
         for processed_user in self.users:
-            if processed_user.username == username:
+            if processed_user == username:
                 foundUser = True
                 if not processed_user.has_level(userlevel):
                     processed_user.add_level(userlevel)
                     return self.success_add_user_level(
-                        processed_user.username, str(processed_user.last_level())
+                        processed_user, processed_user.last_level()
                     )
                 else:
-                    return self.fail_duplicate_code(
-                        username, str(userlevel), processed_user.username
-                    )
+                    return self.fail_duplicate_code(username, userlevel, processed_user)
 
         if not foundUser:
             foundUser = User(username)
             foundUser.add_level(userlevel)
             self.users.append(foundUser)
-            return self.success_add_user_level(
-                foundUser.username, str(foundUser.last_level())
-            )
+            return self.success_add_user_level(foundUser, foundUser.last_level())
 
     def get_current_level(self):
         if self.current_level == None:
             return self.fail_current_level_not_selected()
         else:
-            return self.success_current_level(
-                str(self.current_level), self.current_username
-            )
+            return self.success_current_level(self.current_level, self.current_user)
 
     def find_first_user_with_level(self):
-        for theuser in self.users:
-            if len(theuser.levels) > 0:
-                return theuser
+        for user in self.users:
+            if len(user.levels) > 0:
+                return user
         return None
 
     def next_level(self, caller_user):
-        if str(caller_user) == self.current_owner.username:
+        if caller_user == self.current_owner:
             found_user = self.find_first_user_with_level()
             if found_user:
                 self.current_level = found_user.next_level()
-                self.current_username = found_user.username
-                return self.success_next_level(
-                    str(self.current_level), found_user.username
-                )
+                self.current_user = found_user
+                return self.success_next_level(self.current_level, found_user)
             return self.fail_next_level_no_more_levels()
         else:
             return self.fail_next_level_not_owner()
 
     def mod(self, caller_name, user_to_mod):
-        if user_to_mod == "":
+        if not user_to_mod:
             return self.fail_mod_none_specified()
-        if caller_name == self.current_owner.username:
-            for theuser in self.users:
-                if theuser.username == user_to_mod:
-                    theuser.make_mod()
-                    return self.success_mod(theuser.username)
+        if caller_name == self.current_owner:
+            for user in self.users:
+                if user == user_to_mod:
+                    user.make_mod()
+                    return self.success_mod(user)
             modded_user = User(user_to_mod, MOD_LEVEL_MOD)
             self.users.append(modded_user)
             return self.success_mod(modded_user)
@@ -202,18 +194,18 @@ class Processor:
     def unmod(self, caller_name, user_to_unmod):
         if user_to_unmod == "":
             return self.fail_unmod_none_specified()
-        if caller_name == self.current_owner.username:
-            for theuser in self.users:
-                if theuser.username == user_to_unmod:
-                    theuser.make_user()
-                    return self.success_unmod(theuser.username)
+        if caller_name == self.current_owner:
+            for user in self.users:
+                if user == user_to_unmod:
+                    user.make_user()
+                    return self.success_unmod(user)
             return self.fail_unmod_cannot_find_user(user_to_unmod)
         return self.fail_unmod_not_owner()
 
     def is_mod_or_owner(self, username):
-        for theuser in self.users:
-            if theuser.username == username:
-                return theuser.is_mod_or_owner()
+        for user in self.users:
+            if user == username:
+                return user.is_mod_or_owner()
         return False
 
     def remove(self, caller_name, level):
@@ -221,7 +213,7 @@ class Processor:
             return self.fail_remove_no_level_specified()
 
         level_fmt = Level(level)
-        if not str(level_fmt):
+        if not level_fmt:
             return self.fail_remove_invalid_level_code(level)
 
         for user in self.users:
@@ -229,11 +221,9 @@ class Processor:
                 if user_level != level:
                     continue
 
-                if self.is_mod_or_owner(caller_name) or caller_name == str(user):
+                if self.is_mod_or_owner(caller_name) or caller_name == user:
                     user.levels.remove(user_level)
-                    return self.success_remove_user_level(str(user), str(user_level))
+                    return self.success_remove_user_level(user, user_level)
 
-                return self.fail_remove_no_permission(
-                    caller_name, str(user), str(user_level)
-                )
-        return self.fail_remove_level_not_found(str(level_fmt))
+                return self.fail_remove_no_permission(caller_name, user, user_level)
+        return self.fail_remove_level_not_found(level_fmt)
