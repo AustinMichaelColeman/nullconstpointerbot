@@ -17,7 +17,13 @@ class Processor:
     def success_list(self, users):
         output = ""
         user_index = 0
+
+        users_with_levels = []
         for theuser in users:
+            if len(theuser.levels) > 0:
+                users_with_levels.append(theuser)
+
+        for theuser in users_with_levels:
             output += theuser.username
             output += " "
             level_index = 0
@@ -26,7 +32,7 @@ class Processor:
                 if level_index < (len(theuser.levels) - 1):
                     output += ", "
                 level_index += 1
-            if user_index < (len(users) - 1):
+            if user_index < (len(users_with_levels) - 1):
                 output += " | "
             user_index += 1
 
