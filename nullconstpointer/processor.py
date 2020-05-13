@@ -117,6 +117,9 @@ class Processor:
     def fail_remove_level_not_found(self, level_not_found):
         return "Remove failed: could not find level " + level_not_found
 
+    def fail_remove_no_permission_no_level_specified(self, caller_name):
+        return caller_name + " does not have permission to remove levels."
+
     def fail_remove_no_permission(self, caller_name, level_submitter_name, level_code):
         return (
             caller_name

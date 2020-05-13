@@ -214,6 +214,27 @@ class TestProcessor(unittest.TestCase):
             ),
         )
 
+    def test_remove_level_none_fails_owner(self):
+        response = self.test_processor.remove(self.test_owner, None)
+
+        self.assertEqual(response, self.test_processor.fail_remove_no_level_specified())
+
+    def test_remove_level_none_fails_mod(self):
+        self.test_processor.mod(self.test_owner, "userA")
+        response = self.test_processor.remove("userA", None)
+
+        self.assertEqual(response, self.test_processor.fail_remove_no_level_specified())
+
+    def test_remove_level_none_fails_user(self):
+        self.test_processor.mod(self.test_owner, "userA")
+        self.test_processor.unmod(self.test_owner, "userA")
+
+        response = self.test_processor.remove("userA", None)
+
+        self.assertEqual(
+            response, self.test_processor.fail_remove_no_level_specified(),
+        )
+
     def test_leave_called_by_user_with_no_levels(self):
         response = self.test_processor.leave("userA")
 
