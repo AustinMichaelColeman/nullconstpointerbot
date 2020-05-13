@@ -120,19 +120,31 @@ class Bot(SingleServerIRCBot):
 
     def mod(self, chatuser, *args):
         username = chatuser["name"]
+        user_to_mod = args[0]
         if username == self.bot_owner.username:
             if len(args) != 1:
                 response = (
                     chatuser["name"] + ", please provide a valid username to mod."
                 )
             else:
-                response = self.cmdprocessor.mod(args[0])
+                response = self.cmdprocessor.mod(username, user_to_mod)
         else:
             response = username + ", you do not have permission to mod."
         self.send_message(response)
 
     def unmod(self, chatuser, *args):
-        pass
+        username = chatuser["name"]
+        user_to_unmod = args[0]
+        if username == self.bot_owner.username:
+            if len(args) != 1:
+                response = (
+                    chatuser["name"] + ", please provide a valid username to mod."
+                )
+            else:
+                response = self.cmdprocessor.unmod(username, user_to_unmod)
+        else:
+            response = username + ", you do not have permission to mod."
+        self.send_message(response)
 
     def github(self, chatuser, *args):
         self.send_message("https://github.com/AustinMichaelColeman/nullconstpointerbot")

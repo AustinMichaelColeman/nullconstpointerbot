@@ -90,6 +90,25 @@ class TestProcessor(unittest.TestCase):
     def test_next_only_usable_by_mods(self):
         self.test_processor.add_user_level("userA", "abc-def-gha")
 
+    def test_mod_success(self):
+        response = self.test_processor.mod(self.test_owner.username, "userB")
+        self.assertEqual(response, self.test_processor.success_mod("userB"))
+
+    def test_mod_fail_none_specified(self):
+        response = self.test_processor.mod(self.test_owner.username, "")
+        self.assertEqual(response, self.test_processor.fail_mod_none_specified())
+
+    def test_unmod_success(self):
+        self.test_processor.mod(self.test_owner.username, "userB")
+        response = self.test_processor.unmod(self.test_owner.username, "userB")
+
+        self.assertEqual(response, self.test_processor.success_unmod("userB"))
+
+    def test_unmod_fail(self):
+        response = self.test_processor.unmod("userB", "userA")
+
+        self.assertEqual(response, self.test_processor.fail_unmod_not_owner())
+
 
 if __name__ == "__main__":
     unittest.main()
