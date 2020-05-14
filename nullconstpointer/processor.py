@@ -22,15 +22,6 @@ class Processor:
             level_count += len(user.levels)
         return level_count
 
-    def success_next_level(self, next_level, username):
-        return f"The next level has been selected: {next_level} submitted by {username}"
-
-    def fail_next_level_no_more_levels(self):
-        return "There are no more levels to select."
-
-    def fail_next_level_not_owner(self):
-        return f"Next can only be called by the owner: {self.current_owner}"
-
     def success_mod(self, user_to_mod):
         return f"{user_to_mod} is now a mod!"
 
@@ -111,17 +102,6 @@ class Processor:
             if len(user.levels) > 0:
                 return user
         return None
-
-    def next_level(self, caller_user):
-        if caller_user == self.current_owner:
-            found_user = self.find_first_user_with_level()
-            if found_user:
-                self.current_level = found_user.next_level()
-                self.current_user = found_user
-                return self.success_next_level(self.current_level, found_user)
-            return self.fail_next_level_no_more_levels()
-        else:
-            return self.fail_next_level_not_owner()
 
     def mod(self, caller_name, user_to_mod):
         if caller_name != self.current_owner:

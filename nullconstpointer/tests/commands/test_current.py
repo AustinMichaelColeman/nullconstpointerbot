@@ -4,6 +4,7 @@ from nullconstpointer.user import User, MOD_LEVEL_OWNER
 from nullconstpointer.processor import Processor
 from nullconstpointer.commands.add import AddCommand
 from nullconstpointer.commands.current import CurrentCommand
+from nullconstpointer.commands.next import NextCommand
 
 
 class TestCommandCurrent(unittest.TestCase):
@@ -19,7 +20,8 @@ class TestCommandCurrent(unittest.TestCase):
     def test_current_level_success_with_next_level_owner(self):
         command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
         self.test_processor.process_command(command)
-        self.test_processor.next_level(self.test_owner)
+        command = NextCommand(self.test_processor, self.test_owner)
+        self.test_processor.process_command(command)
 
         command = CurrentCommand(self.test_processor)
         response = self.test_processor.process_command(command)
@@ -31,9 +33,11 @@ class TestCommandCurrent(unittest.TestCase):
         self.test_processor.process_command(command)
         command = AddCommand(self.test_processor, "userB", "userB", "123-123-124")
         self.test_processor.process_command(command)
-        self.test_processor.next_level(self.test_owner)
+        command = NextCommand(self.test_processor, self.test_owner)
+        self.test_processor.process_command(command)
         self.test_processor.remove_current(self.test_owner)
-        self.test_processor.next_level(self.test_owner)
+        command = NextCommand(self.test_processor, self.test_owner)
+        self.test_processor.process_command(command)
         command = CurrentCommand(self.test_processor)
         response = self.test_processor.process_command(command)
 

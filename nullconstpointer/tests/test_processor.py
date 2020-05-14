@@ -14,34 +14,6 @@ class TestProcessor(unittest.TestCase):
     def test_processor_users_equal_to_one(self):
         self.assertEqual(self.test_processor.user_count(), 1)
 
-    def test_next_level_fails_if_no_more_levels(self):
-        response = self.test_processor.next_level(self.test_owner)
-
-        self.assertEqual(response, self.test_processor.fail_next_level_no_more_levels())
-
-    def test_next_level_fails_if_not_owner(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
-        self.test_processor.process_command(command)
-        test_user = User("userA")
-        response = self.test_processor.next_level(test_user)
-
-        self.assertEqual(response, self.test_processor.fail_next_level_not_owner())
-
-    def test_next_level_success(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
-        self.test_processor.process_command(command)
-        response = self.test_processor.next_level(self.test_owner)
-        self.assertEqual(
-            response, self.test_processor.success_next_level("ABC-DEF-GHA", "userA")
-        )
-
-    def test_next_not_usable_by_mods(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
-        self.test_processor.process_command(command)
-        self.test_processor.mod(self.test_owner, "userA")
-        response = self.test_processor.next_level("userA")
-        self.assertEqual(response, self.test_processor.fail_next_level_not_owner())
-
     def test_mod_success(self):
         response = self.test_processor.mod(self.test_owner.username, "userB")
         self.assertEqual(response, self.test_processor.success_mod("userB"))
