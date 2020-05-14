@@ -22,18 +22,6 @@ class Processor:
             level_count += len(user.levels)
         return level_count
 
-    def success_mod(self, user_to_mod):
-        return f"{user_to_mod} is now a mod!"
-
-    def fail_mod(self, user_to_mod):
-        return f"Unable to mod: Could not find {user_to_mod}"
-
-    def fail_mod_not_owner(self):
-        return f"Only the owner {self.current_owner} can call !mod"
-
-    def fail_mod_none_specified(self):
-        return "Unable to mod, please specify a user."
-
     def success_unmod(self, user_to_unmod):
         return f"{user_to_unmod} is no longer a mod."
 
@@ -102,20 +90,6 @@ class Processor:
             if len(user.levels) > 0:
                 return user
         return None
-
-    def mod(self, caller_name, user_to_mod):
-        if caller_name != self.current_owner:
-            return self.fail_mod_not_owner()
-        if not user_to_mod:
-            return self.fail_mod_none_specified()
-
-        for user in self.users:
-            if user == user_to_mod:
-                user.make_mod()
-                return self.success_mod(user)
-        modded_user = User(user_to_mod, MOD_LEVEL_MOD)
-        self.users.append(modded_user)
-        return self.success_mod(modded_user)
 
     def unmod(self, caller_name, user_to_unmod):
         if caller_name != self.current_owner:

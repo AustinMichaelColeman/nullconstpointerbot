@@ -11,6 +11,7 @@ from nullconstpointer.commands.list import ListCommand
 from nullconstpointer.commands.add import AddCommand
 from nullconstpointer.commands.current import CurrentCommand
 from nullconstpointer.commands.next import NextCommand
+from nullconstpointer.commands.mod import ModCommand
 
 
 class Bot(SingleServerIRCBot):
@@ -140,9 +141,11 @@ class Bot(SingleServerIRCBot):
         username = chatuser["name"]
         if len(args) == 1:
             user_to_mod = args[0]
-            self.send_message(self.cmdprocessor.mod(username, user_to_mod))
+            command = ModCommand(self.cmdprocessor, username, user_to_mod)
+            self.send_message(self.cmdprocessor.process_command(command))
         else:
-            self.send_message(self.cmdprocessor.mod(username, None))
+            command = ModCommand(self.cmdprocessor, username, None)
+            self.send_message(self.cmdprocessor.process_command(command))
 
     def unmod(self, chatuser, *args):
         username = chatuser["name"]

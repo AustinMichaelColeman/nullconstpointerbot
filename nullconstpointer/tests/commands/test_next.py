@@ -4,6 +4,7 @@ from nullconstpointer.user import User, MOD_LEVEL_OWNER
 from nullconstpointer.processor import Processor
 from nullconstpointer.commands.add import AddCommand
 from nullconstpointer.commands.next import NextCommand
+from nullconstpointer.commands.mod import ModCommand
 
 
 class TestCommandNext(unittest.TestCase):
@@ -36,7 +37,10 @@ class TestCommandNext(unittest.TestCase):
     def test_next_not_usable_by_mods(self):
         command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
         self.test_processor.process_command(command)
-        self.test_processor.mod(self.test_owner, "userA")
+
+        command = ModCommand(self.test_processor, self.test_owner, "userA")
+        self.test_processor.process_command(command)
+
         command = NextCommand(self.test_processor, "userA")
         response = self.test_processor.process_command(command)
         self.assertEqual(response, command.fail_next_level_not_owner())

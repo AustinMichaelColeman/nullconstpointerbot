@@ -4,6 +4,7 @@ from nullconstpointer.processor import Processor
 from nullconstpointer.user import User, MOD_LEVEL_OWNER, MOD_LEVEL_MOD, MOD_LEVEL_USER
 from nullconstpointer.level import Level
 from nullconstpointer.commands.add import AddCommand
+from nullconstpointer.commands.mod import ModCommand
 
 
 class TestProcessor(unittest.TestCase):
@@ -14,33 +15,10 @@ class TestProcessor(unittest.TestCase):
     def test_processor_users_equal_to_one(self):
         self.assertEqual(self.test_processor.user_count(), 1)
 
-    def test_mod_success(self):
-        response = self.test_processor.mod(self.test_owner.username, "userB")
-        self.assertEqual(response, self.test_processor.success_mod("userB"))
-
-    def test_mod_fail_none_specified(self):
-        response = self.test_processor.mod(self.test_owner.username, "")
-        self.assertEqual(response, self.test_processor.fail_mod_none_specified())
-
-    def test_mod_fail_when_user_to_mod_none_as_owner(self):
-        response = self.test_processor.mod(self.test_owner, None)
-        self.assertEqual(response, self.test_processor.fail_mod_none_specified())
-
-    def test_mod_fail_when_user_to_mod_none_as_mod(self):
-        self.test_processor.mod(self.test_owner, "userA")
-        response = self.test_processor.mod("userA", None)
-
-        self.assertEqual(response, self.test_processor.fail_mod_not_owner())
-
-    def test_mod_fail_when_user_to_mod_none_as_user(self):
-        self.test_processor.mod(self.test_owner, "userA")
-        self.test_processor.unmod(self.test_owner, "userA")
-
-        response = self.test_processor.mod("userA", None)
-        self.assertEqual(response, self.test_processor.fail_mod_not_owner())
-
     def test_unmod_success(self):
-        self.test_processor.mod(self.test_owner.username, "userB")
+        command = ModCommand(self.test_processor, self.test_owner, "userB")
+        self.test_processor.process_command(command)
+
         response = self.test_processor.unmod(self.test_owner.username, "userB")
 
         self.assertEqual(response, self.test_processor.success_unmod("userB"))
@@ -55,13 +33,15 @@ class TestProcessor(unittest.TestCase):
         self.assertEqual(response, self.test_processor.fail_unmod_none_specified())
 
     def test_unmod_fail_when_user_to_unmod_none_as_mod(self):
-        self.test_processor.mod(self.test_owner, "userA")
+        command = ModCommand(self.test_processor, self.test_owner, "userA")
+        self.test_processor.process_command(command)
         response = self.test_processor.unmod("userA", None)
 
         self.assertEqual(response, self.test_processor.fail_unmod_not_owner())
 
     def test_unmod_fail_when_user_to_unmod_none_as_user(self):
-        self.test_processor.mod(self.test_owner, "userA")
+        command = ModCommand(self.test_processor, self.test_owner, "userA")
+        self.test_processor.process_command(command)
         self.test_processor.unmod(self.test_owner, "userA")
 
         response = self.test_processor.unmod("userA", None)
@@ -109,7 +89,8 @@ class TestProcessor(unittest.TestCase):
         )
 
     def test_remove_called_by_mod(self):
-        self.test_processor.mod(self.test_owner.username, "userA")
+        command = ModCommand(self.test_processor, self.test_owner, "userA")
+        self.test_processor.process_command(command)
         command = AddCommand(self.test_processor, "userB", "userB", "abc-def-ghd")
         self.test_processor.process_command(command)
         response = self.test_processor.remove("userA", "abc-def-ghd")
@@ -147,13 +128,15 @@ class TestProcessor(unittest.TestCase):
         self.assertEqual(response, self.test_processor.fail_remove_no_level_specified())
 
     def test_remove_level_none_fails_mod(self):
-        self.test_processor.mod(self.test_owner, "userA")
+        command = ModCommand(self.test_processor, self.test_owner, "userA")
+        self.test_processor.process_command(command)
         response = self.test_processor.remove("userA", None)
 
         self.assertEqual(response, self.test_processor.fail_remove_no_level_specified())
 
     def test_remove_level_none_fails_user(self):
-        self.test_processor.mod(self.test_owner, "userA")
+        command = ModCommand(self.test_processor, self.test_owner, "userA")
+        self.test_processor.process_command(command)
         self.test_processor.unmod(self.test_owner, "userA")
 
         response = self.test_processor.remove("userA", None)
@@ -184,13 +167,15 @@ class TestProcessor(unittest.TestCase):
         self.assertEqual(response, self.test_processor.success_leave("userA"))
 
     def test_leave_called_by_mod_with_no_levels(self):
-        self.test_processor.mod(self.test_owner, "userA")
+        command = ModCommand(self.test_processor, self.test_owner, "userA")
+        self.test_processor.process_command(command)
         response = self.test_processor.leave("userA")
 
         self.assertEqual(response, self.test_processor.fail_leave_no_levels("userA"))
 
     def test_leave_called_by_mod_with_levels(self):
-        self.test_processor.mod(self.test_owner, "userA")
+        command = ModCommand(self.test_processor, self.test_owner, "userA")
+        self.test_processor.process_command(command)
         command = AddCommand(self.test_processor, "userA", "userA", "abc-def-ghd")
         self.test_processor.process_command(command)
         response = self.test_processor.leave("userA")
@@ -215,7 +200,8 @@ class TestProcessor(unittest.TestCase):
         self.assertEqual(response, self.test_processor.success_clear_owner())
 
     def test_clear_called_by_mod_without_levels(self):
-        self.test_processor.mod(self.test_owner, "userA")
+        command = ModCommand(self.test_processor, self.test_owner, "userA")
+        self.test_processor.process_command(command)
         response = self.test_processor.clear("userA")
 
         self.assertEqual(
@@ -223,7 +209,8 @@ class TestProcessor(unittest.TestCase):
         )
 
     def test_clear_called_by_mod_with_levels(self):
-        self.test_processor.mod(self.test_owner, "userA")
+        command = ModCommand(self.test_processor, self.test_owner, "userA")
+        self.test_processor.process_command(command)
         command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
         self.test_processor.process_command(command)
         response = self.test_processor.clear("userA")
@@ -308,7 +295,8 @@ class TestProcessor(unittest.TestCase):
         self.assertIn(response, possible_responses)
 
     def test_random_called_by_mod(self):
-        self.test_processor.mod(self.test_owner, "userA")
+        command = ModCommand(self.test_processor, self.test_owner, "userA")
+        self.test_processor.process_command(command)
         response = self.test_processor.random_level("userA")
 
         self.assertEqual(
@@ -357,7 +345,8 @@ class TestProcessor(unittest.TestCase):
     def test_remove_current_called_by_mod_with_levels(self):
         command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
         self.test_processor.process_command(command)
-        self.test_processor.mod(self.test_owner, "userA")
+        command = ModCommand(self.test_processor, self.test_owner, "userA")
+        self.test_processor.process_command(command)
         response = self.test_processor.remove_current("userA")
 
         self.assertEqual(
@@ -365,8 +354,9 @@ class TestProcessor(unittest.TestCase):
         )
 
     def test_remove_current_called_by_mod_without_levels(self):
+        command = ModCommand(self.test_processor, self.test_owner, "userA")
+        self.test_processor.process_command(command)
         response = self.test_processor.remove_current("userA")
-        self.test_processor.mod(self.test_owner, "userA")
 
         self.assertEqual(
             response, self.test_processor.fail_remove_current_no_permission("userA")
