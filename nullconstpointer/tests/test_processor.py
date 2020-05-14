@@ -3,6 +3,7 @@ import unittest
 from nullconstpointer.processor import Processor
 from nullconstpointer.user import User, MOD_LEVEL_OWNER, MOD_LEVEL_MOD, MOD_LEVEL_USER
 from nullconstpointer.level import Level
+from nullconstpointer.commands.add import AddCommand
 
 
 class TestProcessor(unittest.TestCase):
@@ -13,38 +14,6 @@ class TestProcessor(unittest.TestCase):
     def test_processor_users_equal_to_one(self):
         self.assertEqual(self.test_processor.user_count(), 1)
 
-    def test_add_user_level_response_valid(self):
-        response = self.test_processor.add_user_level("userA", "abc-def-ghd")
-
-        self.assertEqual(
-            response, self.test_processor.success_add_user_level("userA", "ABC-DEF-GHD")
-        )
-
-    def test_add_user_level_multiple_duplicate_levels_fails(self):
-        self.test_processor.add_user_level("userA", "abc-def-ghd")
-        response = self.test_processor.add_user_level("userA", "abc-def-ghd")
-        self.assertEqual(
-            response,
-            self.test_processor.fail_add_user_level_duplicate_code(
-                "userA", "ABC-DEF-GHD", "userA"
-            ),
-        )
-
-    def test_add_user_level_multiple_different_levels_succeeds(self):
-        self.test_processor.add_user_level("userA", "abc-def-ghd")
-        response = self.test_processor.add_user_level("userA", "abc-def-gha")
-        self.assertEqual(
-            response,
-            self.test_processor.success_add_user_level("userA", "ABC-DEF-GHA"),
-        )
-
-    def test_add_user_level_response_invalid(self):
-        response = self.test_processor.add_user_level("userA", "abc-def-gh")
-        self.assertEqual(
-            response,
-            self.test_processor.fail_add_user_level_invalid_code("userA", "abc-def-gh"),
-        )
-
     def test_current_level_is_none(self):
         response = self.test_processor.get_current_level()
         self.assertEqual(
@@ -52,7 +21,8 @@ class TestProcessor(unittest.TestCase):
         )
 
     def test_current_level_success_with_next_level_owner(self):
-        self.test_processor.add_user_level("userA", "abc-def-gha")
+        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
+        self.test_processor.process_command(command)
         self.test_processor.next_level(self.test_owner)
 
         response = self.test_processor.get_current_level()
@@ -67,21 +37,27 @@ class TestProcessor(unittest.TestCase):
         self.assertEqual(response, self.test_processor.fail_next_level_no_more_levels())
 
     def test_next_level_fails_if_not_owner(self):
-        self.test_processor.add_user_level("userA", "abc-def-gha")
+        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
+        self.test_processor.process_command(command)
         test_user = User("userA")
         response = self.test_processor.next_level(test_user)
 
         self.assertEqual(response, self.test_processor.fail_next_level_not_owner())
 
     def test_next_level_success(self):
-        self.test_processor.add_user_level("userA", "abc-def-gha")
+        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
+        self.test_processor.process_command(command)
         response = self.test_processor.next_level(self.test_owner)
         self.assertEqual(
             response, self.test_processor.success_next_level("ABC-DEF-GHA", "userA")
         )
 
-    def test_next_only_usable_by_mods(self):
-        self.test_processor.add_user_level("userA", "abc-def-gha")
+    def test_next_not_usable_by_mods(self):
+        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
+        self.test_processor.process_command(command)
+        self.test_processor.mod(self.test_owner, "userA")
+        response = self.test_processor.next_level("userA")
+        self.assertEqual(response, self.test_processor.fail_next_level_not_owner())
 
     def test_mod_success(self):
         response = self.test_processor.mod(self.test_owner.username, "userB")
@@ -156,7 +132,8 @@ class TestProcessor(unittest.TestCase):
         )
 
     def test_remove_called_by_user_with_one_level(self):
-        self.test_processor.add_user_level("userA", "abc-def-ghd")
+        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-ghd")
+        self.test_processor.process_command(command)
         response = self.test_processor.remove("userA", "abc-def-ghd")
 
         self.assertEqual(
@@ -165,8 +142,10 @@ class TestProcessor(unittest.TestCase):
         )
 
     def test_remove_called_by_user_with_two_levels(self):
-        self.test_processor.add_user_level("userA", "abc-def-ghd")
-        self.test_processor.add_user_level("userA", "abc-def-gha")
+        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-ghd")
+        self.test_processor.process_command(command)
+        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
+        self.test_processor.process_command(command)
         response = self.test_processor.remove("userA", "abc-def-ghd")
 
         self.assertEqual(
@@ -176,7 +155,8 @@ class TestProcessor(unittest.TestCase):
 
     def test_remove_called_by_mod(self):
         self.test_processor.mod(self.test_owner.username, "userA")
-        self.test_processor.add_user_level("userB", "abc-def-ghd")
+        command = AddCommand(self.test_processor, "userB", "userB", "abc-def-ghd")
+        self.test_processor.process_command(command)
         response = self.test_processor.remove("userA", "abc-def-ghd")
 
         self.assertEqual(
@@ -185,7 +165,8 @@ class TestProcessor(unittest.TestCase):
         )
 
     def test_remove_called_by_owner(self):
-        self.test_processor.add_user_level("userB", "abc-def-ghd")
+        command = AddCommand(self.test_processor, "userB", "userB", "abc-def-ghd")
+        self.test_processor.process_command(command)
         response = self.test_processor.remove(str(self.test_owner), "abc-def-ghd")
 
         self.assertEqual(
@@ -194,7 +175,8 @@ class TestProcessor(unittest.TestCase):
         )
 
     def test_remove_called_by_user_fails(self):
-        self.test_processor.add_user_level("userA", "abc-def-ghd")
+        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-ghd")
+        self.test_processor.process_command(command)
         response = self.test_processor.remove("userB", "abc-def-ghd")
 
         self.assertEqual(
@@ -231,14 +213,17 @@ class TestProcessor(unittest.TestCase):
         self.assertEqual(response, self.test_processor.fail_leave_no_levels("userA"))
 
     def test_leave_called_by_user_with_one_level(self):
-        self.test_processor.add_user_level("userA", "abc-def-ghd")
+        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
+        self.test_processor.process_command(command)
         response = self.test_processor.leave("userA")
 
         self.assertEqual(response, self.test_processor.success_leave("userA"))
 
     def test_leave_called_by_user_with_two_levels(self):
-        self.test_processor.add_user_level("userA", "abc-def-ghd")
-        self.test_processor.add_user_level("userA", "abc-def-gha")
+        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-ghd")
+        self.test_processor.process_command(command)
+        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
+        self.test_processor.process_command(command)
         response = self.test_processor.leave("userA")
 
         self.assertEqual(response, self.test_processor.success_leave("userA"))
@@ -251,7 +236,8 @@ class TestProcessor(unittest.TestCase):
 
     def test_leave_called_by_mod_with_levels(self):
         self.test_processor.mod(self.test_owner, "userA")
-        self.test_processor.add_user_level("userA", "abc-def-ghd")
+        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-ghd")
+        self.test_processor.process_command(command)
         response = self.test_processor.leave("userA")
 
         self.assertEqual(response, self.test_processor.success_leave("userA"))
@@ -262,9 +248,13 @@ class TestProcessor(unittest.TestCase):
         self.assertEqual(response, self.test_processor.success_clear_owner())
 
     def test_clear_called_by_owner_with_levels(self):
-        self.test_processor.add_user_level("userA", "123-123-123")
-        self.test_processor.add_user_level("userA", "123-123-124")
-        self.test_processor.add_user_level("userB", "123-123-126")
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
+        self.test_processor.process_command(command)
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-124")
+        self.test_processor.process_command(command)
+        command = AddCommand(self.test_processor, "userA", "userB", "123-123-126")
+        self.test_processor.process_command(command)
+
         response = self.test_processor.clear(self.test_owner)
 
         self.assertEqual(response, self.test_processor.success_clear_owner())
@@ -279,7 +269,8 @@ class TestProcessor(unittest.TestCase):
 
     def test_clear_called_by_mod_with_levels(self):
         self.test_processor.mod(self.test_owner, "userA")
-        self.test_processor.add_user_level("userA", "123-123-123")
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
+        self.test_processor.process_command(command)
         response = self.test_processor.clear("userA")
 
         self.assertEqual(response, self.test_processor.success_clear_user("userA"))
@@ -292,9 +283,12 @@ class TestProcessor(unittest.TestCase):
         )
 
     def test_clear_called_by_user_with_levels(self):
-        self.test_processor.add_user_level("userA", "123-123-123")
-        self.test_processor.add_user_level("userA", "123-123-124")
-        self.test_processor.add_user_level("userB", "123-123-125")
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
+        self.test_processor.process_command(command)
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-124")
+        self.test_processor.process_command(command)
+        command = AddCommand(self.test_processor, "userA", "userB", "123-123-125")
+        self.test_processor.process_command(command)
         response = self.test_processor.clear("userA")
 
         self.assertEqual(response, self.test_processor.success_clear_user("userA"))
@@ -306,8 +300,10 @@ class TestProcessor(unittest.TestCase):
         self.assertEqual(response, self.test_processor.fail_random_no_levels())
 
     def test_random_called_by_owner_with_levels(self):
-        self.test_processor.add_user_level("userA", "123-123-123")
-        self.test_processor.add_user_level("userB", "123-123-124")
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
+        self.test_processor.process_command(command)
+        command = AddCommand(self.test_processor, "userB", "userB", "123-123-124")
+        self.test_processor.process_command(command)
         response = self.test_processor.random_level(self.test_owner)
 
         possible_responses = [
@@ -318,9 +314,12 @@ class TestProcessor(unittest.TestCase):
         self.assertIn(response, possible_responses)
 
     def test_random_called_by_owner_first_level_submitted_selected(self):
-        self.test_processor.add_user_level("userA", "123-123-123")
-        self.test_processor.add_user_level("userA", "123-123-121")
-        self.test_processor.add_user_level("userA", "123-123-120")
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
+        self.test_processor.process_command(command)
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-121")
+        self.test_processor.process_command(command)
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-120")
+        self.test_processor.process_command(command)
         response = self.test_processor.random_level(self.test_owner)
 
         self.assertEqual(
@@ -335,10 +334,14 @@ class TestProcessor(unittest.TestCase):
         )
 
     def test_random_called_by_owner_first_level_submitted_selected_multi_user(self):
-        self.test_processor.add_user_level("userA", "123-123-121")
-        self.test_processor.add_user_level("userB", "123-123-122")
-        self.test_processor.add_user_level("userB", "123-123-123")
-        self.test_processor.add_user_level("userA", "123-123-124")
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-121")
+        self.test_processor.process_command(command)
+        command = AddCommand(self.test_processor, "userA", "userB", "123-123-122")
+        self.test_processor.process_command(command)
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
+        self.test_processor.process_command(command)
+        command = AddCommand(self.test_processor, "userA", "userB", "123-123-124")
+        self.test_processor.process_command(command)
 
         response = self.test_processor.random_level(self.test_owner)
 
@@ -370,7 +373,8 @@ class TestProcessor(unittest.TestCase):
         self.assertEqual(response, self.test_processor.fail_remove_current_no_levels())
 
     def test_remove_current_called_by_owner_with_levels(self):
-        self.test_processor.add_user_level("userA", "123-123-123")
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
+        self.test_processor.process_command(command)
         self.test_processor.random_level(self.test_owner)
         response = self.test_processor.remove_current(self.test_owner)
 
@@ -380,7 +384,8 @@ class TestProcessor(unittest.TestCase):
         )
 
     def test_remove_current_called_by_user_with_levels(self):
-        self.test_processor.add_user_level("userA", "123-123-123")
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
+        self.test_processor.process_command(command)
         response = self.test_processor.remove_current("userA")
 
         self.assertEqual(
@@ -395,7 +400,8 @@ class TestProcessor(unittest.TestCase):
         )
 
     def test_remove_current_called_by_mod_with_levels(self):
-        self.test_processor.add_user_level("userA", "123-123-123")
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
+        self.test_processor.process_command(command)
         self.test_processor.mod(self.test_owner, "userA")
         response = self.test_processor.remove_current("userA")
 
@@ -412,8 +418,10 @@ class TestProcessor(unittest.TestCase):
         )
 
     def test_remove_current_changes_output_of_current(self):
-        self.test_processor.add_user_level("userA", "123-123-123")
-        self.test_processor.add_user_level("userB", "123-123-124")
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
+        self.test_processor.process_command(command)
+        command = AddCommand(self.test_processor, "userB", "userB", "123-123-124")
+        self.test_processor.process_command(command)
         self.test_processor.next_level(self.test_owner)
         self.test_processor.remove_current(self.test_owner)
         self.test_processor.next_level(self.test_owner)

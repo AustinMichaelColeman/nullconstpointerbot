@@ -8,6 +8,7 @@ from nullconstpointer.processor import Processor
 from nullconstpointer.user import User, MOD_LEVEL_OWNER, MOD_LEVEL_MOD, MOD_LEVEL_USER
 
 from nullconstpointer.commands.list import ListCommand
+from nullconstpointer.commands.add import AddCommand
 
 
 class Bot(SingleServerIRCBot):
@@ -112,7 +113,10 @@ class Bot(SingleServerIRCBot):
         if len(args) != 1:
             response = chatuser["name"] + ", please provide a valid level code."
         else:
-            response = self.cmdprocessor.add_user_level(chatuser["name"], args[0])
+            command = AddCommand(
+                self.cmdprocessor, chatuser["name"], chatuser["name"], args[0]
+            )
+            response = self.cmdprocessor.process_command(command)
         self.send_message(response)
 
     def list_levels(self, chatuser, *args):
@@ -174,3 +178,17 @@ class Bot(SingleServerIRCBot):
 
     def habits(self, chatuser, *args):
         self.send_message("https://pastebin.com/WBMgKmDz")
+
+
+class CommandInvoker:
+    def __init__(self):
+        self._commands = {}
+
+    def register(self, command_name, command):
+        self._commands[command_name] = command
+
+    def execute(self, command_name):
+        if command_name in self._commands.keys():
+            self._commands[command_name].execute()
+        else:
+            print(f"Command [{command_name}] not recognised")

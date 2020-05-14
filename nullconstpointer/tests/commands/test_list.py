@@ -3,6 +3,7 @@ import unittest
 from nullconstpointer.user import User, MOD_LEVEL_OWNER
 from nullconstpointer.processor import Processor
 from nullconstpointer.commands.list import ListCommand
+from nullconstpointer.commands.add import AddCommand
 
 
 class TestCommandList(unittest.TestCase):
@@ -16,8 +17,10 @@ class TestCommandList(unittest.TestCase):
         self.assertEqual(response, command.success_list_empty())
 
     def test_list_levels_one_user_one_level(self):
-        self.test_processor.add_user_level("userA", "abc-def-gha")
-        self.test_processor.add_user_level("userA", "abc-def-ghb")
+        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
+        self.test_processor.process_command(command)
+        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
+        self.test_processor.process_command(command)
         command = ListCommand(self.test_processor)
         response = self.test_processor.process_command(command)
         self.assertEqual(response, command.success_list())

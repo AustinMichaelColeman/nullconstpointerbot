@@ -22,20 +22,6 @@ class Processor:
             level_count += len(user.levels)
         return level_count
 
-    def success_add_user_level(self, username, levelcode):
-        return f"Thank you {username}, your level {levelcode} has been added."
-
-    def fail_add_user_level_invalid_code(self, username, levelcode):
-        return f"{username} has entered an invalid level code: {levelcode}"
-
-    def fail_add_user_level_duplicate_code(
-        self, username_of_command, levelcode, username_of_level
-    ):
-        return (
-            f"{username_of_command}, that level code {levelcode} "
-            f"has already been entered by {username_of_level}"
-        )
-
     def fail_current_level_not_selected(self):
         return "No level has been selected yet."
 
@@ -125,31 +111,6 @@ class Processor:
 
     def fail_remove_current_no_permission(self, caller_name):
         return f"{caller_name}, only the owner {self.current_owner} can use !finish"
-
-    def add_user_level(self, username, levelcode):
-        userlevel = Level(levelcode)
-        if not userlevel:
-            return self.fail_add_user_level_invalid_code(username, levelcode)
-
-        foundUser = False
-        for processed_user in self.users:
-            if processed_user == username:
-                foundUser = True
-                if not processed_user.has_level(userlevel):
-                    processed_user.add_level(userlevel)
-                    return self.success_add_user_level(
-                        processed_user, processed_user.last_level()
-                    )
-                else:
-                    return self.fail_add_user_level_duplicate_code(
-                        username, userlevel, processed_user
-                    )
-
-        if not foundUser:
-            foundUser = User(username)
-            foundUser.add_level(userlevel)
-            self.users.append(foundUser)
-            return self.success_add_user_level(foundUser, foundUser.last_level())
 
     def get_current_level(self):
         if self.current_level == None:
