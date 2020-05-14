@@ -22,33 +22,6 @@ class Processor:
             level_count += len(user.levels)
         return level_count
 
-    def success_list_empty(self):
-        return "There are no levels to list"
-
-    def success_list(self, users):
-        output = ""
-        user_index = 0
-
-        users_with_levels = []
-        for user in users:
-            if len(user.levels) > 0:
-                users_with_levels.append(user)
-
-        for user in users_with_levels:
-            output += user
-            output += " "
-            level_index = 0
-            for thelevel in user.levels:
-                output += thelevel
-                if level_index < (len(user.levels) - 1):
-                    output += ", "
-                level_index += 1
-            if user_index < (len(users_with_levels) - 1):
-                output += " | "
-            user_index += 1
-
-        return output
-
     def success_add_user_level(self, username, levelcode):
         return (
             "Thank you " + username + ", your level " + levelcode + " has been added."
@@ -57,7 +30,9 @@ class Processor:
     def fail_add_user_level_invalid_code(self, username, levelcode):
         return username + " has entered an invalid level code: " + levelcode
 
-    def fail_duplicate_code(self, username_of_command, levelcode, username_of_level):
+    def fail_add_user_level_duplicate_code(
+        self, username_of_command, levelcode, username_of_level
+    ):
         return (
             username_of_command
             + ", that level code "
@@ -184,12 +159,6 @@ class Processor:
             + " can use !removecurrent"
         )
 
-    def list_levels(self):
-        if not self.find_first_user_with_level():
-            return self.success_list_empty()
-        else:
-            return self.success_list(self.users)
-
     def add_user_level(self, username, levelcode):
         userlevel = Level(levelcode)
         if not userlevel:
@@ -205,7 +174,9 @@ class Processor:
                         processed_user, processed_user.last_level()
                     )
                 else:
-                    return self.fail_duplicate_code(username, userlevel, processed_user)
+                    return self.fail_add_user_level_duplicate_code(
+                        username, userlevel, processed_user
+                    )
 
         if not foundUser:
             foundUser = User(username)
@@ -347,3 +318,6 @@ class Processor:
             return self.fail_remove_current_no_levels()
 
         return self.remove(caller_name, self.current_level)
+
+    def process_command(self, command):
+        return command.execute(self)

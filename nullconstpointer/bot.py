@@ -7,6 +7,8 @@ from requests import get
 from nullconstpointer.processor import Processor
 from nullconstpointer.user import User, MOD_LEVEL_OWNER, MOD_LEVEL_MOD, MOD_LEVEL_USER
 
+from nullconstpointer.commands.list import ListCommand
+
 
 class Bot(SingleServerIRCBot):
     def __init__(self, botname, owner, client_id, token):
@@ -114,7 +116,8 @@ class Bot(SingleServerIRCBot):
         self.send_message(response)
 
     def list_levels(self, chatuser, *args):
-        response = self.cmdprocessor.list_levels()
+        command = ListCommand(self.cmdprocessor)
+        response = self.cmdprocessor.process_command(command)
         self.send_message(response)
 
     def next_level(self, chatuser, *args):

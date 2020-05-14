@@ -25,7 +25,9 @@ class TestProcessor(unittest.TestCase):
         response = self.test_processor.add_user_level("userA", "abc-def-ghd")
         self.assertEqual(
             response,
-            self.test_processor.fail_duplicate_code("userA", "ABC-DEF-GHD", "userA"),
+            self.test_processor.fail_add_user_level_duplicate_code(
+                "userA", "ABC-DEF-GHD", "userA"
+            ),
         )
 
     def test_add_user_level_multiple_different_levels_succeeds(self):
@@ -41,18 +43,6 @@ class TestProcessor(unittest.TestCase):
         self.assertEqual(
             response,
             self.test_processor.fail_add_user_level_invalid_code("userA", "abc-def-gh"),
-        )
-
-    def test_list_levels_empty(self):
-        response = self.test_processor.list_levels()
-        self.assertEqual(response, self.test_processor.success_list_empty())
-
-    def test_list_levels_one_user_one_level(self):
-        self.test_processor.add_user_level("userA", "abc-def-gha")
-        self.test_processor.add_user_level("userA", "abc-def-ghb")
-        response = self.test_processor.list_levels()
-        self.assertEqual(
-            response, self.test_processor.success_list(self.test_processor.users)
         )
 
     def test_current_level_is_none(self):
