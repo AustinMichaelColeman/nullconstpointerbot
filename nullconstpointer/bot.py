@@ -98,8 +98,8 @@ class Bot(SingleServerIRCBot):
 
     def help(self, prefix, cmds):
         self.send_message(
-            "Registered commands: "
-            + ",".join([f"{prefix}{cmd}" for cmd in sorted(cmds.keys())])
+            "Hi. I'm a Mario Maker 2 Twitch chat bot. Registered commands: "
+            + ", ".join([f"{prefix}{cmd}" for cmd in sorted(cmds.keys())])
         )
 
     def hello(self, chatuser, *args):
