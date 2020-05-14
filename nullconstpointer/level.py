@@ -31,7 +31,8 @@ class Level:
         # Text allowed in level codes: 0-9 A-Z a-z except I O Z
         # ignore anything but 0-9, A-Z, a-z, except IiOoZz
         # remove everything but 0-9, A-Z, a-z except IiOoZz
-        non_alpha_numberic_removed = re.sub("[\\W_IiOoZz]+", "", level)
+
+        non_alpha_numberic_removed = re.sub("([^ -~]|[\\W_IiOoZz])+", "", level)
         if len(non_alpha_numberic_removed) != 9:
             return None
         non_alpha_numberic_removed = non_alpha_numberic_removed.upper()
