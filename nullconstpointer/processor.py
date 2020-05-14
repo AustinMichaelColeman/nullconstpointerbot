@@ -22,18 +22,6 @@ class Processor:
             level_count += len(user.levels)
         return level_count
 
-    def success_unmod(self, user_to_unmod):
-        return f"{user_to_unmod} is no longer a mod."
-
-    def fail_unmod_cannot_find_user(self, user_to_unmod):
-        return f"Unable to unmod: Could not find {user_to_unmod}"
-
-    def fail_unmod_none_specified(self):
-        return "Unable to unmod, please specify a user."
-
-    def fail_unmod_not_owner(self):
-        return f"Only the owner {self.current_owner} can call !mod"
-
     def fail_remove_no_level_specified(self):
         return "Remove failed: no level specified."
 
@@ -90,19 +78,6 @@ class Processor:
             if len(user.levels) > 0:
                 return user
         return None
-
-    def unmod(self, caller_name, user_to_unmod):
-        if caller_name != self.current_owner:
-            return self.fail_unmod_not_owner()
-
-        if not user_to_unmod:
-            return self.fail_unmod_none_specified()
-
-        for user in self.users:
-            if user == user_to_unmod:
-                user.make_user()
-                return self.success_unmod(user)
-        return self.fail_unmod_cannot_find_user(user_to_unmod)
 
     def is_mod_or_owner(self, username):
         for user in self.users:

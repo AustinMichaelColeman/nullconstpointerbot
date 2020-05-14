@@ -5,6 +5,7 @@ from nullconstpointer.user import User, MOD_LEVEL_OWNER, MOD_LEVEL_MOD, MOD_LEVE
 from nullconstpointer.level import Level
 from nullconstpointer.commands.add import AddCommand
 from nullconstpointer.commands.mod import ModCommand
+from nullconstpointer.commands.unmod import UnmodCommand
 
 
 class TestProcessor(unittest.TestCase):
@@ -14,38 +15,6 @@ class TestProcessor(unittest.TestCase):
 
     def test_processor_users_equal_to_one(self):
         self.assertEqual(self.test_processor.user_count(), 1)
-
-    def test_unmod_success(self):
-        command = ModCommand(self.test_processor, self.test_owner, "userB")
-        self.test_processor.process_command(command)
-
-        response = self.test_processor.unmod(self.test_owner.username, "userB")
-
-        self.assertEqual(response, self.test_processor.success_unmod("userB"))
-
-    def test_unmod_fail(self):
-        response = self.test_processor.unmod("userB", "userA")
-
-        self.assertEqual(response, self.test_processor.fail_unmod_not_owner())
-
-    def test_unmod_fail_when_user_to_unmod_none_as_owner(self):
-        response = self.test_processor.unmod(self.test_owner, None)
-        self.assertEqual(response, self.test_processor.fail_unmod_none_specified())
-
-    def test_unmod_fail_when_user_to_unmod_none_as_mod(self):
-        command = ModCommand(self.test_processor, self.test_owner, "userA")
-        self.test_processor.process_command(command)
-        response = self.test_processor.unmod("userA", None)
-
-        self.assertEqual(response, self.test_processor.fail_unmod_not_owner())
-
-    def test_unmod_fail_when_user_to_unmod_none_as_user(self):
-        command = ModCommand(self.test_processor, self.test_owner, "userA")
-        self.test_processor.process_command(command)
-        self.test_processor.unmod(self.test_owner, "userA")
-
-        response = self.test_processor.unmod("userA", None)
-        self.assertEqual(response, self.test_processor.fail_unmod_not_owner())
 
     def test_remove_called_without_args(self):
         response = self.test_processor.remove("userA", "")
@@ -137,7 +106,8 @@ class TestProcessor(unittest.TestCase):
     def test_remove_level_none_fails_user(self):
         command = ModCommand(self.test_processor, self.test_owner, "userA")
         self.test_processor.process_command(command)
-        self.test_processor.unmod(self.test_owner, "userA")
+        command = UnmodCommand(self.test_processor, self.test_owner, "userA")
+        self.test_processor.process_command(command)
 
         response = self.test_processor.remove("userA", None)
 
