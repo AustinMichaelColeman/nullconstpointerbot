@@ -37,6 +37,7 @@ class Bot(SingleServerIRCBot):
             "clear": self.clear,
             "random": self.random,
             "finish": self.remove_current,
+            "habits": self.habits,
         }
 
         url = f"https://api.twitch.tv/kraken/users?login={self.USERNAME}"
@@ -90,8 +91,8 @@ class Bot(SingleServerIRCBot):
         if cmd.upper() == "HELP":
             self.help(self.prefix, self.cmds)
 
-        # else:
-        #     bot.send_message(f"{user['name']}, \"{cmd}\" isn't a registered command.")
+        else:
+            self.send_message(f"{user['name']}, \"{cmd}\" isn't a registered command.")
 
     def help(self, prefix, cmds):
         self.send_message(
@@ -167,3 +168,6 @@ class Bot(SingleServerIRCBot):
     def remove_current(self, chatuser, *args):
         username = chatuser["name"]
         self.send_message(self.cmdprocessor.remove_current(username))
+
+    def habits(self, chatuser, *args):
+        self.send_message("https://pastebin.com/WBMgKmDz")
