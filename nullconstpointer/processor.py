@@ -23,127 +23,99 @@ class Processor:
         return level_count
 
     def success_add_user_level(self, username, levelcode):
-        return (
-            "Thank you " + username + ", your level " + levelcode + " has been added."
-        )
+        return f"Thank you {username}, your level {levelcode} has been added."
 
     def fail_add_user_level_invalid_code(self, username, levelcode):
-        return username + " has entered an invalid level code: " + levelcode
+        return f"{username} has entered an invalid level code: {levelcode}"
 
     def fail_add_user_level_duplicate_code(
         self, username_of_command, levelcode, username_of_level
     ):
         return (
-            username_of_command
-            + ", that level code "
-            + levelcode
-            + " has already been entered by "
-            + username_of_level
+            f"{username_of_command}, that level code {levelcode} "
+            f"has already been entered by {username_of_level}"
         )
 
     def fail_current_level_not_selected(self):
         return "No level has been selected yet."
 
     def success_current_level(self, current_level, user):
-        return "The current level is " + current_level + " submitted by " + user
+        return f"The current level is {current_level} submitted by {user}"
 
     def success_next_level(self, next_level, username):
-        return (
-            "The next level has been selected: "
-            + next_level
-            + " submitted by "
-            + username
-        )
+        return f"The next level has been selected: {next_level} submitted by {username}"
 
     def fail_next_level_no_more_levels(self):
         return "There are no more levels to select."
 
     def fail_next_level_not_owner(self):
-        return "Next can only be called by the owner: " + self.current_owner
+        return f"Next can only be called by the owner: {self.current_owner}"
 
     def success_mod(self, user_to_mod):
-        return user_to_mod + " is now a mod!"
+        return f"{user_to_mod} is now a mod!"
 
     def fail_mod(self, user_to_mod):
-        return "Unable to mod: Could not find " + user_to_mod
+        return f"Unable to mod: Could not find {user_to_mod}"
 
     def fail_mod_not_owner(self):
-        return "Only the owner " + self.current_owner + " can call !mod"
+        return f"Only the owner {self.current_owner} can call !mod"
 
     def fail_mod_none_specified(self):
         return "Unable to mod, please specify a user."
 
     def success_unmod(self, user_to_unmod):
-        return user_to_unmod + " is no longer a mod."
+        return f"{user_to_unmod} is no longer a mod."
 
     def fail_unmod_cannot_find_user(self, user_to_unmod):
-        return "Unable to unmod: Could not find " + user_to_unmod
+        return f"Unable to unmod: Could not find {user_to_unmod}"
 
     def fail_unmod_none_specified(self):
         return "Unable to unmod, please specify a user."
 
     def fail_unmod_not_owner(self):
-        return "Only the owner " + self.current_owner + " can call !mod"
+        return f"Only the owner {self.current_owner} can call !mod"
 
     def fail_remove_no_level_specified(self):
         return "Remove failed: no level specified."
 
     def fail_remove_invalid_level_code(self, invalid_level_code):
-        return "Remove failed: invalid level code: " + invalid_level_code
+        return f"Remove failed: invalid level code: {invalid_level_code}"
 
     def success_remove_user_level(self, user_submitted_by, level_removed):
-        return (
-            "Successfully removed level "
-            + level_removed
-            + " submitted by "
-            + user_submitted_by
-        )
+        return f"Successfully removed level {level_removed} submitted by {user_submitted_by}"
 
     def fail_remove_level_not_found(self, level_not_found):
-        return "Remove failed: could not find level " + level_not_found
+        return f"Remove failed: could not find level {level_not_found}"
 
     def fail_remove_no_permission_no_level_specified(self, caller_name):
-        return caller_name + " does not have permission to remove levels."
+        return f"{caller_name} does not have permission to remove levels."
 
     def fail_remove_no_permission(self, caller_name, level_submitter_name, level_code):
         return (
-            caller_name
-            + " does not have permission to remove "
-            + level_code
-            + " submitted by "
-            + level_submitter_name
+            f"{caller_name} does not have permission "
+            f"to remove {level_code} submitted by {level_submitter_name}"
         )
 
     def fail_leave_no_levels(self, caller):
-        return caller + " has no levels to remove."
+        return f"{caller} has no levels to remove."
 
     def success_leave(self, caller):
-        return "Removed all levels submitted by " + caller
+        return f"Removed all levels submitted by {caller}"
 
     def success_clear_owner(self):
         return "Successfully cleared all levels."
 
     def success_clear_user(self, caller_name):
-        return "Cleared all levels submitted by " + caller_name
+        return f"Cleared all levels submitted by {caller_name}"
 
     def fail_clear_user_no_levels(self, caller_name):
-        return caller_name + " does not have any levels added."
+        return f"{caller_name} does not have any levels added."
 
     def success_random_level(self, level_submitter_name, level_code):
-        return (
-            level_submitter_name
-            + ", your level "
-            + level_code
-            + " has been randomly selected!"
-        )
+        return f"{level_submitter_name}, your level {level_code} has been randomly selected!"
 
     def fail_random_no_permission(self, caller_name):
-        return (
-            caller_name
-            + ", only the owner "
-            + self.current_owner
-            + " can call !random."
-        )
+        return f"{caller_name}, only the owner {self.current_owner} can call !random"
 
     def fail_random_no_levels(self):
         return "There are no levels to select at random."
@@ -152,12 +124,7 @@ class Processor:
         return "There are no levels currently selected."
 
     def fail_remove_current_no_permission(self, caller_name):
-        return (
-            caller_name
-            + ", only the owner "
-            + self.current_owner
-            + " can use !removecurrent"
-        )
+        return f"{caller_name}, only the owner {self.current_owner} can use !finish"
 
     def add_user_level(self, username, levelcode):
         userlevel = Level(levelcode)
