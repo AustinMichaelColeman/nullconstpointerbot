@@ -14,23 +14,6 @@ class TestProcessor(unittest.TestCase):
     def test_processor_users_equal_to_one(self):
         self.assertEqual(self.test_processor.user_count(), 1)
 
-    def test_current_level_is_none(self):
-        response = self.test_processor.get_current_level()
-        self.assertEqual(
-            response, self.test_processor.fail_current_level_not_selected()
-        )
-
-    def test_current_level_success_with_next_level_owner(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
-        self.test_processor.process_command(command)
-        self.test_processor.next_level(self.test_owner)
-
-        response = self.test_processor.get_current_level()
-
-        self.assertEqual(
-            response, self.test_processor.success_current_level("ABC-DEF-GHA", "userA")
-        )
-
     def test_next_level_fails_if_no_more_levels(self):
         response = self.test_processor.next_level(self.test_owner)
 
@@ -415,20 +398,6 @@ class TestProcessor(unittest.TestCase):
 
         self.assertEqual(
             response, self.test_processor.fail_remove_current_no_permission("userA")
-        )
-
-    def test_remove_current_changes_output_of_current(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userB", "userB", "123-123-124")
-        self.test_processor.process_command(command)
-        self.test_processor.next_level(self.test_owner)
-        self.test_processor.remove_current(self.test_owner)
-        self.test_processor.next_level(self.test_owner)
-        response = self.test_processor.get_current_level()
-
-        self.assertEqual(
-            response, self.test_processor.success_current_level("123-123-124", "userB")
         )
 
 

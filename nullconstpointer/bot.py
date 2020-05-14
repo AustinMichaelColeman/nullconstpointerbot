@@ -9,6 +9,7 @@ from nullconstpointer.user import User, MOD_LEVEL_OWNER, MOD_LEVEL_MOD, MOD_LEVE
 
 from nullconstpointer.commands.list import ListCommand
 from nullconstpointer.commands.add import AddCommand
+from nullconstpointer.commands.current import CurrentCommand
 
 
 class Bot(SingleServerIRCBot):
@@ -129,7 +130,8 @@ class Bot(SingleServerIRCBot):
         self.send_message(response)
 
     def current_level(self, chatuser, *args):
-        response = self.cmdprocessor.get_current_level()
+        command = CurrentCommand(self.cmdprocessor)
+        response = self.cmdprocessor.process_command(command)
         self.send_message(response)
 
     def mod(self, chatuser, *args):

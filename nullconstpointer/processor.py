@@ -22,12 +22,6 @@ class Processor:
             level_count += len(user.levels)
         return level_count
 
-    def fail_current_level_not_selected(self):
-        return "No level has been selected yet."
-
-    def success_current_level(self, current_level, user):
-        return f"The current level is {current_level} submitted by {user}"
-
     def success_next_level(self, next_level, username):
         return f"The next level has been selected: {next_level} submitted by {username}"
 
@@ -111,12 +105,6 @@ class Processor:
 
     def fail_remove_current_no_permission(self, caller_name):
         return f"{caller_name}, only the owner {self.current_owner} can use !finish"
-
-    def get_current_level(self):
-        if self.current_level == None:
-            return self.fail_current_level_not_selected()
-        else:
-            return self.success_current_level(self.current_level, self.current_user)
 
     def find_first_user_with_level(self):
         for user in self.users:
