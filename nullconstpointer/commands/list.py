@@ -1,12 +1,14 @@
+from nullconstpointer.commands.icommand import ICommand
 
-class ListCommand:
+
+class ListCommand(ICommand):
     def __init__(self, processor):
         self.processor = processor
 
     def success_list_empty(self):
         return "There are no levels to list"
 
-    def execute(self, processor):
+    def execute(self):
         if not self.processor.find_first_user_with_level():
             return self.success_list_empty()
         else:

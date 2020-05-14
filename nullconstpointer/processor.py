@@ -287,4 +287,4 @@ class Processor:
         return self.remove(caller_name, self.current_level)
 
     def process_command(self, command):
-        return command.execute(self)
+        return command.execute()
