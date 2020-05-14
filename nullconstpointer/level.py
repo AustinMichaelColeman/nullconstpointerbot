@@ -3,7 +3,10 @@ import re
 
 class Level:
     def __init__(self, level):
-        self.level_code = self.validate(level)
+        if isinstance(level, Level):
+            self.level_code = level.level_code
+        else:
+            self.level_code = self.validate(level)
 
     def __str__(self):
         return self.level_code

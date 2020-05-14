@@ -173,6 +173,17 @@ class Processor:
     def fail_random_no_levels(self):
         return "There are no levels to select at random."
 
+    def fail_remove_current_no_levels(self):
+        return "There are no levels currently selected."
+
+    def fail_remove_current_no_permission(self, caller_name):
+        return (
+            caller_name
+            + ", only the owner "
+            + self.current_owner
+            + " can use !removecurrent"
+        )
+
     def list_levels(self):
         if not self.find_first_user_with_level():
             return self.success_list_empty()
@@ -273,6 +284,11 @@ class Processor:
 
                 if self.is_mod_or_owner(caller_name) or caller_name == user:
                     user.levels.remove(user_level)
+
+                    if user_level == self.current_level:
+                        self.current_level = None
+                        self.current_user = None
+
                     return self.success_remove_user_level(user, user_level)
 
                 return self.fail_remove_no_permission(caller_name, user, user_level)
@@ -322,3 +338,12 @@ class Processor:
         self.current_level = selected_user.next_level()
         self.current_user = selected_user
         return self.success_random_level(selected_user, self.current_level)
+
+    def remove_current(self, caller_name):
+        if caller_name != self.current_owner:
+            return self.fail_remove_current_no_permission(caller_name)
+
+        if self.current_level is None:
+            return self.fail_remove_current_no_levels()
+
+        return self.remove(caller_name, self.current_level)
