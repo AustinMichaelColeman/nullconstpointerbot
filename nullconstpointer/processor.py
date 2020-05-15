@@ -1,6 +1,3 @@
-import random
-from datetime import datetime
-
 from nullconstpointer.commands.remove import RemoveCommand
 from nullconstpointer.user import User, MOD_LEVEL_OWNER, MOD_LEVEL_MOD, MOD_LEVEL_USER
 
@@ -11,7 +8,6 @@ class Processor:
         self.users = [self.current_owner]
         self.current_user = None
         self.current_level = None
-        random.seed(datetime.now())
 
     def user_count(self):
         return len(self.users)
@@ -21,15 +17,6 @@ class Processor:
         for user in self.users:
             level_count += len(user.levels)
         return level_count
-
-    def success_random_level(self, level_submitter_name, level_code):
-        return f"{level_submitter_name}, your level {level_code} has been randomly selected!"
-
-    def fail_random_no_permission(self, caller_name):
-        return f"{caller_name}, only the owner {self.current_owner} can call !random"
-
-    def fail_random_no_levels(self):
-        return "There are no levels to select at random."
 
     def fail_remove_current_no_levels(self):
         return "There are no levels currently selected."
@@ -48,25 +35,6 @@ class Processor:
             if user == username:
                 return user.is_mod_or_owner()
         return False
-
-    def random_level(self, caller_name):
-        if caller_name != self.current_owner:
-            return self.fail_random_no_permission(caller_name)
-
-        users_with_levels = []
-        for user in self.users:
-            if user.has_levels():
-                users_with_levels += user
-
-        if len(users_with_levels) == 0:
-            return self.fail_random_no_levels()
-
-        random_user_index = random.randrange(0, len(users_with_levels))
-        selected_user = users_with_levels[random_user_index]
-
-        self.current_level = selected_user.next_level()
-        self.current_user = selected_user
-        return self.success_random_level(selected_user, self.current_level)
 
     def remove_current(self, caller_name):
         if caller_name != self.current_owner:

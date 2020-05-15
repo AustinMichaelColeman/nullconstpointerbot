@@ -16,6 +16,7 @@ from nullconstpointer.commands.unmod import UnmodCommand
 from nullconstpointer.commands.remove import RemoveCommand
 from nullconstpointer.commands.clear import ClearCommand
 from nullconstpointer.commands.leave import LeaveCommand
+from nullconstpointer.commands.random import RandomCommand
 
 
 class Bot(SingleServerIRCBot):
@@ -187,7 +188,8 @@ class Bot(SingleServerIRCBot):
 
     def random(self, chatuser, *args):
         username = chatuser["name"]
-        self.send_message(self.cmdprocessor.random_level(username))
+        command = RandomCommand(self.cmdprocessor, username)
+        self.send_message(self.cmdprocessor.process_command(command))
 
     def remove_current(self, chatuser, *args):
         username = chatuser["name"]
