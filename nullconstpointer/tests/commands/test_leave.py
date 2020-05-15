@@ -2,7 +2,6 @@ import unittest
 
 from nullconstpointer.user import User, MOD_LEVEL_OWNER
 from nullconstpointer.processor import Processor
-from nullconstpointer.commands.list import ListCommand
 from nullconstpointer.commands.add import AddCommand
 from nullconstpointer.commands.mod import ModCommand
 from nullconstpointer.commands.leave import LeaveCommand
