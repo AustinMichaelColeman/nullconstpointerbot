@@ -22,14 +22,15 @@ from nullconstpointer.commands.finish import FinishCommand
 
 class Bot(SingleServerIRCBot):
     def __init__(self, botname, owner, client_id, token):
-        self.HOST = "irc.chat.twitch.tv"
-        self.PORT = 6667
-        self.USERNAME = botname.lower()
-        self.CLIENT_ID = str(client_id)
-        self.TOKEN = str(token)
-        self.CHANNEL = f"#{owner}"
+        self.host = "irc.chat.twitch.tv"
+        self.port = 6667
+        self.username = botname.lower()
+        self.client_id = client_id
+        self.token = token
+        self.channel = f"#{owner}"
         self.botname = botname
         self.prefix = "!"
+
         self.bot_owner = User(owner, MOD_LEVEL_OWNER)
 
         self.cmds = {
@@ -52,9 +53,9 @@ class Bot(SingleServerIRCBot):
             "habits": self.habits,
         }
 
-        url = f"https://api.twitch.tv/kraken/users?login={self.USERNAME}"
+        url = f"https://api.twitch.tv/kraken/users?login={self.username}"
         headers = {
-            "Client-ID": self.CLIENT_ID,
+            "Client-ID": self.client_id,
             "Accept": "application/vnd.twitchtv.v5+json",
         }
         resp = get(url, headers=headers).json()
@@ -63,30 +64,30 @@ class Bot(SingleServerIRCBot):
         self.cmdprocessor = Processor(self.bot_owner)
 
         super().__init__(
-            [(self.HOST, self.PORT, f"oauth:{self.TOKEN}")],
-            self.USERNAME,
-            self.USERNAME,
+            [(self.host, self.port, f"oauth:{self.token}")],
+            self.username,
+            self.username,
         )
 
     def on_welcome(self, cxn, event):
         for req in ("membership", "tags", "commands"):
             cxn.cap("REQ", f":twitch.tv/{req}")
 
-        cxn.join(self.CHANNEL)
+        cxn.join(self.channel)
         self.send_message("Now online.")
 
     def on_pubmsg(self, cxn, event):
         tags = {kvpair["key"]: kvpair["value"] for kvpair in event.tags}
-        user = {"name": tags["display-name"], "id": tags["user-id"]}
+        username = tags["display-name"]
         message = event.arguments[0]
 
-        if user["name"] != self.botname:
-            self.process(user, message)
+        if username != self.botname:
+            self.process(username, message)
 
-        print(f"Message from {user['name']}: {message}")
+        print(f"Message from {username}: {message}")
 
     def send_message(self, message):
-        self.connection.privmsg(self.CHANNEL, message)
+        self.connection.privmsg(self.channel, message)
 
     def process(self, user, message):
         if message.startswith(self.prefix):
@@ -104,7 +105,7 @@ class Bot(SingleServerIRCBot):
             self.help(self.prefix, self.cmds)
 
         else:
-            self.send_message(f"{user['name']}, \"{cmd}\" isn't a registered command.")
+            self.send_message(f'{user}, "{cmd}" isn\'t a registered command.')
 
     def help(self, prefix, cmds):
         self.send_message(
@@ -113,18 +114,16 @@ class Bot(SingleServerIRCBot):
         )
 
     def hello(self, chatuser, *args):
-        self.send_message(f"Hey {chatuser['name']}!")
+        self.send_message(f"Hey {chatuser}!")
 
     def friendcode(self, chatuser, *args):
         self.send_message(f"Add me on your switch! My friend code is SW-2444-3895-1309")
 
     def add(self, chatuser, *args):
         if len(args) != 1:
-            response = chatuser["name"] + ", please provide a valid level code."
+            response = chatuser + ", please provide a valid level code."
         else:
-            command = AddCommand(
-                self.cmdprocessor, chatuser["name"], chatuser["name"], args[0]
-            )
+            command = AddCommand(self.cmdprocessor, chatuser, chatuser, args[0])
             response = self.cmdprocessor.process_command(command)
         self.send_message(response)
 
@@ -134,7 +133,7 @@ class Bot(SingleServerIRCBot):
         self.send_message(response)
 
     def next_level(self, chatuser, *args):
-        command = NextCommand(self.cmdprocessor, chatuser["name"])
+        command = NextCommand(self.cmdprocessor, chatuser)
         response = self.cmdprocessor.process_command(command)
         self.send_message(response)
 
@@ -144,7 +143,7 @@ class Bot(SingleServerIRCBot):
         self.send_message(response)
 
     def mod(self, chatuser, *args):
-        username = chatuser["name"]
+        username = chatuser
         if len(args) == 1:
             user_to_mod = args[0]
             command = ModCommand(self.cmdprocessor, username, user_to_mod)
@@ -154,7 +153,7 @@ class Bot(SingleServerIRCBot):
             self.send_message(self.cmdprocessor.process_command(command))
 
     def unmod(self, chatuser, *args):
-        username = chatuser["name"]
+        username = chatuser
         if len(args) == 1:
             user_to_unmod = args[0]
             command = UnmodCommand(self.cmdprocessor, username, user_to_unmod)
@@ -164,7 +163,7 @@ class Bot(SingleServerIRCBot):
             self.send_message(self.cmdprocessor.process_command(command))
 
     def remove(self, chatuser, *args):
-        username = chatuser["name"]
+        username = chatuser
 
         if len(args) == 1:
             level_to_remove = args[0]
@@ -178,38 +177,24 @@ class Bot(SingleServerIRCBot):
         self.send_message("https://github.com/AustinMichaelColeman/nullconstpointerbot")
 
     def leave(self, chatuser, *args):
-        username = chatuser["name"]
+        username = chatuser
         command = LeaveCommand(self.cmdprocessor, username)
         self.send_message(self.cmdprocessor.process_command(command))
 
     def clear(self, chatuser, *args):
-        username = chatuser["name"]
+        username = chatuser
         command = ClearCommand(self.cmdprocessor, username)
         self.send_message(self.cmdprocessor.process_command(command))
 
     def random(self, chatuser, *args):
-        username = chatuser["name"]
+        username = chatuser
         command = RandomCommand(self.cmdprocessor, username)
         self.send_message(self.cmdprocessor.process_command(command))
 
     def finish(self, chatuser, *args):
-        username = chatuser["name"]
+        username = chatuser
         command = FinishCommand(self.cmdprocessor, username)
         self.send_message(self.cmdprocessor.process_command(command))
 
     def habits(self, chatuser, *args):
         self.send_message("https://pastebin.com/WBMgKmDz")
-
-
-class CommandInvoker:
-    def __init__(self):
-        self._commands = {}
-
-    def register(self, command_name, command):
-        self._commands[command_name] = command
-
-    def execute(self, command_name):
-        if command_name in self._commands.keys():
-            self._commands[command_name].execute()
-        else:
-            print(f"Command [{command_name}] not recognised")
