@@ -5,6 +5,7 @@ from nullconstpointer.processor import Processor
 from nullconstpointer.commands.add import AddCommand
 from nullconstpointer.commands.current import CurrentCommand
 from nullconstpointer.commands.next import NextCommand
+from nullconstpointer.commands.finish import FinishCommand
 
 
 class TestCommandCurrent(unittest.TestCase):
@@ -35,7 +36,10 @@ class TestCommandCurrent(unittest.TestCase):
         self.test_processor.process_command(command)
         command = NextCommand(self.test_processor, self.test_owner)
         self.test_processor.process_command(command)
-        self.test_processor.remove_current(self.test_owner)
+
+        command = FinishCommand(self.test_processor, self.test_owner)
+        self.test_processor.process_command(command)
+
         command = NextCommand(self.test_processor, self.test_owner)
         self.test_processor.process_command(command)
         command = CurrentCommand(self.test_processor)

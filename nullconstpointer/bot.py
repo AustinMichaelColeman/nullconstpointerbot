@@ -17,6 +17,7 @@ from nullconstpointer.commands.remove import RemoveCommand
 from nullconstpointer.commands.clear import ClearCommand
 from nullconstpointer.commands.leave import LeaveCommand
 from nullconstpointer.commands.random import RandomCommand
+from nullconstpointer.commands.finish import FinishCommand
 
 
 class Bot(SingleServerIRCBot):
@@ -47,7 +48,7 @@ class Bot(SingleServerIRCBot):
             "leave": self.leave,
             "clear": self.clear,
             "random": self.random,
-            "finish": self.remove_current,
+            "finish": self.finish,
             "habits": self.habits,
         }
 
@@ -191,9 +192,10 @@ class Bot(SingleServerIRCBot):
         command = RandomCommand(self.cmdprocessor, username)
         self.send_message(self.cmdprocessor.process_command(command))
 
-    def remove_current(self, chatuser, *args):
+    def finish(self, chatuser, *args):
         username = chatuser["name"]
-        self.send_message(self.cmdprocessor.remove_current(username))
+        command = FinishCommand(self.cmdprocessor, username)
+        self.send_message(self.cmdprocessor.process_command(command))
 
     def habits(self, chatuser, *args):
         self.send_message("https://pastebin.com/WBMgKmDz")
