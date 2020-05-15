@@ -13,6 +13,7 @@ from nullconstpointer.commands.current import CurrentCommand
 from nullconstpointer.commands.next import NextCommand
 from nullconstpointer.commands.mod import ModCommand
 from nullconstpointer.commands.unmod import UnmodCommand
+from nullconstpointer.commands.remove import RemoveCommand
 
 
 class Bot(SingleServerIRCBot):
@@ -163,9 +164,11 @@ class Bot(SingleServerIRCBot):
 
         if len(args) == 1:
             level_to_remove = args[0]
-            self.send_message(self.cmdprocessor.remove(username, level_to_remove))
+            command = RemoveCommand(self.cmdprocessor, username, level_to_remove)
+            self.send_message(self.cmdprocessor.process_command(command))
         else:
-            self.send_message(self.cmdprocessor.remove(username, None))
+            command = RemoveCommand(self.cmdprocessor, username, None)
+            self.send_message(self.cmdprocessor.process_command(command))
 
     def github(self, chatuser, *args):
         self.send_message("https://github.com/AustinMichaelColeman/nullconstpointerbot")

@@ -6,6 +6,7 @@ from nullconstpointer.level import Level
 from nullconstpointer.commands.add import AddCommand
 from nullconstpointer.commands.mod import ModCommand
 from nullconstpointer.commands.unmod import UnmodCommand
+from nullconstpointer.commands.remove import RemoveCommand
 
 
 class TestProcessor(unittest.TestCase):
@@ -15,105 +16,6 @@ class TestProcessor(unittest.TestCase):
 
     def test_processor_users_equal_to_one(self):
         self.assertEqual(self.test_processor.user_count(), 1)
-
-    def test_remove_called_without_args(self):
-        response = self.test_processor.remove("userA", "")
-
-        self.assertEqual(response, self.test_processor.fail_remove_no_level_specified())
-
-    def test_remove_called_with_invalid_level_format(self):
-        response = self.test_processor.remove("userA", "abc-def-ghi")
-
-        self.assertEqual(
-            response, self.test_processor.fail_remove_invalid_level_code("abc-def-ghi")
-        )
-
-    def test_remove_level_not_found(self):
-        response = self.test_processor.remove("userA", "abc-def-ghd")
-
-        self.assertEqual(
-            response, self.test_processor.fail_remove_level_not_found("ABC-DEF-GHD"),
-        )
-
-    def test_remove_called_by_user_with_one_level(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-ghd")
-        self.test_processor.process_command(command)
-        response = self.test_processor.remove("userA", "abc-def-ghd")
-
-        self.assertEqual(
-            response,
-            self.test_processor.success_remove_user_level("userA", "ABC-DEF-GHD"),
-        )
-
-    def test_remove_called_by_user_with_two_levels(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-ghd")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
-        self.test_processor.process_command(command)
-        response = self.test_processor.remove("userA", "abc-def-ghd")
-
-        self.assertEqual(
-            response,
-            self.test_processor.success_remove_user_level("userA", "ABC-DEF-GHD"),
-        )
-
-    def test_remove_called_by_mod(self):
-        command = ModCommand(self.test_processor, self.test_owner, "userA")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userB", "userB", "abc-def-ghd")
-        self.test_processor.process_command(command)
-        response = self.test_processor.remove("userA", "abc-def-ghd")
-
-        self.assertEqual(
-            response,
-            self.test_processor.success_remove_user_level("userB", "ABC-DEF-GHD"),
-        )
-
-    def test_remove_called_by_owner(self):
-        command = AddCommand(self.test_processor, "userB", "userB", "abc-def-ghd")
-        self.test_processor.process_command(command)
-        response = self.test_processor.remove(str(self.test_owner), "abc-def-ghd")
-
-        self.assertEqual(
-            response,
-            self.test_processor.success_remove_user_level("userB", "ABC-DEF-GHD"),
-        )
-
-    def test_remove_called_by_user_fails(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-ghd")
-        self.test_processor.process_command(command)
-        response = self.test_processor.remove("userB", "abc-def-ghd")
-
-        self.assertEqual(
-            response,
-            self.test_processor.fail_remove_no_permission(
-                "userB", "userA", "ABC-DEF-GHD"
-            ),
-        )
-
-    def test_remove_level_none_fails_owner(self):
-        response = self.test_processor.remove(self.test_owner, None)
-
-        self.assertEqual(response, self.test_processor.fail_remove_no_level_specified())
-
-    def test_remove_level_none_fails_mod(self):
-        command = ModCommand(self.test_processor, self.test_owner, "userA")
-        self.test_processor.process_command(command)
-        response = self.test_processor.remove("userA", None)
-
-        self.assertEqual(response, self.test_processor.fail_remove_no_level_specified())
-
-    def test_remove_level_none_fails_user(self):
-        command = ModCommand(self.test_processor, self.test_owner, "userA")
-        self.test_processor.process_command(command)
-        command = UnmodCommand(self.test_processor, self.test_owner, "userA")
-        self.test_processor.process_command(command)
-
-        response = self.test_processor.remove("userA", None)
-
-        self.assertEqual(
-            response, self.test_processor.fail_remove_no_level_specified(),
-        )
 
     def test_leave_called_by_user_with_no_levels(self):
         response = self.test_processor.leave("userA")
@@ -238,7 +140,9 @@ class TestProcessor(unittest.TestCase):
             response, self.test_processor.success_random_level("userA", "123-123-123")
         )
 
-        self.test_processor.remove(self.test_owner, "123-123-123")
+        command = RemoveCommand(self.test_processor, self.test_owner, "123-123-123")
+        self.test_processor.process_command(command)
+
         response = self.test_processor.random_level(self.test_owner)
 
         self.assertEqual(
@@ -291,9 +195,11 @@ class TestProcessor(unittest.TestCase):
         self.test_processor.random_level(self.test_owner)
         response = self.test_processor.remove_current(self.test_owner)
 
+        # hack for now, make success_remove_user_level not require an object to call it
+        # in the future
+        removeCommand = RemoveCommand(self.test_processor, "userA", "123-123-123")
         self.assertEqual(
-            response,
-            self.test_processor.success_remove_user_level("userA", "123-123-123"),
+            response, removeCommand.success_remove_user_level("userA", "123-123-123"),
         )
 
     def test_remove_current_called_by_user_with_levels(self):

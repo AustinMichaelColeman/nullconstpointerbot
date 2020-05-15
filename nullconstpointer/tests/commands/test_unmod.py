@@ -8,7 +8,7 @@ from nullconstpointer.commands.mod import ModCommand
 from nullconstpointer.commands.unmod import UnmodCommand
 
 
-class TestCommandNext(unittest.TestCase):
+class TestCommandUnmod(unittest.TestCase):
     def setUp(self):
         self.test_owner = User("test_owner", MOD_LEVEL_OWNER)
         self.test_processor = Processor(self.test_owner)

@@ -1,7 +1,7 @@
 import random
 from datetime import datetime
 
-from nullconstpointer.level import Level
+from nullconstpointer.commands.remove import RemoveCommand
 from nullconstpointer.user import User, MOD_LEVEL_OWNER, MOD_LEVEL_MOD, MOD_LEVEL_USER
 
 
@@ -21,27 +21,6 @@ class Processor:
         for user in self.users:
             level_count += len(user.levels)
         return level_count
-
-    def fail_remove_no_level_specified(self):
-        return "Remove failed: no level specified."
-
-    def fail_remove_invalid_level_code(self, invalid_level_code):
-        return f"Remove failed: invalid level code: {invalid_level_code}"
-
-    def success_remove_user_level(self, user_submitted_by, level_removed):
-        return f"Successfully removed level {level_removed} submitted by {user_submitted_by}"
-
-    def fail_remove_level_not_found(self, level_not_found):
-        return f"Remove failed: could not find level {level_not_found}"
-
-    def fail_remove_no_permission_no_level_specified(self, caller_name):
-        return f"{caller_name} does not have permission to remove levels."
-
-    def fail_remove_no_permission(self, caller_name, level_submitter_name, level_code):
-        return (
-            f"{caller_name} does not have permission "
-            f"to remove {level_code} submitted by {level_submitter_name}"
-        )
 
     def fail_leave_no_levels(self, caller):
         return f"{caller} has no levels to remove."
@@ -84,31 +63,6 @@ class Processor:
             if user == username:
                 return user.is_mod_or_owner()
         return False
-
-    def remove(self, caller_name, level):
-        if not level:
-            return self.fail_remove_no_level_specified()
-
-        level_fmt = Level(level)
-        if not level_fmt:
-            return self.fail_remove_invalid_level_code(level)
-
-        for user in self.users:
-            for user_level in user.levels:
-                if user_level != level:
-                    continue
-
-                if self.is_mod_or_owner(caller_name) or caller_name == user:
-                    user.levels.remove(user_level)
-
-                    if user_level == self.current_level:
-                        self.current_level = None
-                        self.current_user = None
-
-                    return self.success_remove_user_level(user, user_level)
-
-                return self.fail_remove_no_permission(caller_name, user, user_level)
-        return self.fail_remove_level_not_found(level_fmt)
 
     def leave(self, caller_name):
         for user in self.users:
@@ -162,7 +116,8 @@ class Processor:
         if self.current_level is None:
             return self.fail_remove_current_no_levels()
 
-        return self.remove(caller_name, self.current_level)
+        command = RemoveCommand(self, caller_name, self.current_level)
+        return self.process_command(command)
 
     def process_command(self, command):
         return command.execute()
