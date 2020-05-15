@@ -15,6 +15,7 @@ from nullconstpointer.commands.mod import ModCommand
 from nullconstpointer.commands.unmod import UnmodCommand
 from nullconstpointer.commands.remove import RemoveCommand
 from nullconstpointer.commands.clear import ClearCommand
+from nullconstpointer.commands.leave import LeaveCommand
 
 
 class Bot(SingleServerIRCBot):
@@ -176,7 +177,8 @@ class Bot(SingleServerIRCBot):
 
     def leave(self, chatuser, *args):
         username = chatuser["name"]
-        self.send_message(self.cmdprocessor.leave(username))
+        command = LeaveCommand(self.cmdprocessor, username)
+        self.send_message(self.cmdprocessor.process_command(command))
 
     def clear(self, chatuser, *args):
         username = chatuser["name"]

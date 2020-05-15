@@ -22,12 +22,6 @@ class Processor:
             level_count += len(user.levels)
         return level_count
 
-    def fail_leave_no_levels(self, caller):
-        return f"{caller} has no levels to remove."
-
-    def success_leave(self, caller):
-        return f"Removed all levels submitted by {caller}"
-
     def success_random_level(self, level_submitter_name, level_code):
         return f"{level_submitter_name}, your level {level_code} has been randomly selected!"
 
@@ -54,16 +48,6 @@ class Processor:
             if user == username:
                 return user.is_mod_or_owner()
         return False
-
-    def leave(self, caller_name):
-        for user in self.users:
-            if user == caller_name:
-                if user.levels:
-                    user.levels.clear()
-                    return self.success_leave(caller_name)
-                else:
-                    return self.fail_leave_no_levels(caller_name)
-        return self.fail_leave_no_levels(caller_name)
 
     def random_level(self, caller_name):
         if caller_name != self.current_owner:
