@@ -2,8 +2,10 @@
 Some code in this file is licensed under the Apache License, Version 2.0.
     http://aws.amazon.com/apache2.0/
 """
+import re
 from irc.bot import SingleServerIRCBot
 from requests import get
+
 from nullconstpointer.bot.processor import Processor
 from nullconstpointer.bot.user import (
     User,
@@ -74,6 +76,9 @@ class Bot(SingleServerIRCBot):
             self.username,
         )
 
+    def contains_invalid_characters(self, command):
+        return re.search("([^A-Za-z])+", command) is not None
+
     def on_welcome(self, cxn, event):
         for req in ("membership", "tags", "commands"):
             cxn.cap("REQ", f":twitch.tv/{req}")
@@ -100,7 +105,13 @@ class Bot(SingleServerIRCBot):
             args = message.split(" ")[1:]
             self.perform(user, cmd, *args)
 
+    def unregistered_command(self, user, cmd):
+        return f'{user}, "{cmd}" isn\'t a registered command.'
+
     def perform(self, user, cmd, *args):
+        if self.contains_invalid_characters(cmd):
+            self.send_message(self.unregistered_command(user, cmd))
+
         for name, func in self.cmds.items():
             if cmd.upper() == name.upper():
                 func(user, *args)
@@ -110,7 +121,7 @@ class Bot(SingleServerIRCBot):
             self.help(self.prefix, self.cmds)
 
         else:
-            self.send_message(f'{user}, "{cmd}" isn\'t a registered command.')
+            self.send_message(self.unregistered_command(user, cmd))
 
     def help(self, prefix, cmds):
         self.send_message(
