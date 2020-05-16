@@ -1,6 +1,6 @@
 import unittest
 
-from nullconstpointer.level import Level
+from nullconstpointer.bot.level import Level
 
 
 class TestLevels(unittest.TestCase):

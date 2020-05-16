@@ -1,5 +1,10 @@
 from nullconstpointer.commands.remove import RemoveCommand
-from nullconstpointer.user import User, MOD_LEVEL_OWNER, MOD_LEVEL_MOD, MOD_LEVEL_USER
+from nullconstpointer.bot.user import (
+    User,
+    MOD_LEVEL_OWNER,
+    MOD_LEVEL_MOD,
+    MOD_LEVEL_USER,
+)
 
 
 class Processor:

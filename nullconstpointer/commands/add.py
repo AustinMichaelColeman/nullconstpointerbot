@@ -1,6 +1,6 @@
 from nullconstpointer.commands.icommand import ICommand
-from nullconstpointer.level import Level
-from nullconstpointer.user import User
+from nullconstpointer.bot.level import Level
+from nullconstpointer.bot.user import User
 
 
 class AddCommand(ICommand):

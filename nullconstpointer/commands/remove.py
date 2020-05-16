@@ -1,5 +1,5 @@
 from nullconstpointer.commands.icommand import ICommand
-from nullconstpointer.level import Level
+from nullconstpointer.bot.level import Level
 
 
 class RemoveCommand(ICommand):

@@ -1,7 +1,12 @@
 import unittest
 
-from nullconstpointer.processor import Processor
-from nullconstpointer.user import User, MOD_LEVEL_OWNER, MOD_LEVEL_MOD, MOD_LEVEL_USER
+from nullconstpointer.bot.processor import Processor
+from nullconstpointer.bot.user import (
+    User,
+    MOD_LEVEL_OWNER,
+    MOD_LEVEL_MOD,
+    MOD_LEVEL_USER,
+)
 
 
 class TestProcessor(unittest.TestCase):

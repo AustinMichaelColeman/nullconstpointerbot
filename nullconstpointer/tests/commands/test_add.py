@@ -1,6 +1,6 @@
 import unittest
-from nullconstpointer.user import User, MOD_LEVEL_OWNER
-from nullconstpointer.processor import Processor
+from nullconstpointer.bot.user import User, MOD_LEVEL_OWNER
+from nullconstpointer.bot.processor import Processor
 from nullconstpointer.commands.add import AddCommand
 
 

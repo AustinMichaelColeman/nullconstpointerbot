@@ -1,4 +1,4 @@
-from nullconstpointer.bot import Bot
+from nullconstpointer.bot.bot import Bot
 import keys
 
 

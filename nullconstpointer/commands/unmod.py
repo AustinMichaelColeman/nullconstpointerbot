@@ -1,5 +1,5 @@
 from nullconstpointer.commands.icommand import ICommand
-from nullconstpointer.user import User, MOD_LEVEL_MOD
+from nullconstpointer.bot.user import User, MOD_LEVEL_MOD
 
 
 class UnmodCommand(ICommand):

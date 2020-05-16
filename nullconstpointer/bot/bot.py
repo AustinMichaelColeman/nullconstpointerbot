@@ -4,8 +4,13 @@ Some code in this file is licensed under the Apache License, Version 2.0.
 """
 from irc.bot import SingleServerIRCBot
 from requests import get
-from nullconstpointer.processor import Processor
-from nullconstpointer.user import User, MOD_LEVEL_OWNER, MOD_LEVEL_MOD, MOD_LEVEL_USER
+from nullconstpointer.bot.processor import Processor
+from nullconstpointer.bot.user import (
+    User,
+    MOD_LEVEL_OWNER,
+    MOD_LEVEL_MOD,
+    MOD_LEVEL_USER,
+)
 
 from nullconstpointer.commands.list import ListCommand
 from nullconstpointer.commands.add import AddCommand
