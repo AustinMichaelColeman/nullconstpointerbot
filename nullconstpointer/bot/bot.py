@@ -125,11 +125,12 @@ class Bot(SingleServerIRCBot):
         self.send_message(f"Add me on your switch! My friend code is SW-2444-3895-1309")
 
     def add(self, chatuser, *args):
-        if len(args) != 1:
-            response = chatuser + ", please provide a valid level code."
-        else:
-            command = AddCommand(self.cmdprocessor, chatuser, chatuser, args[0])
-            response = self.cmdprocessor.process_command(command)
+        argstr = ""
+        for arg in args:
+            argstr += arg
+
+        command = AddCommand(self.cmdprocessor, chatuser, chatuser, argstr)
+        response = self.cmdprocessor.process_command(command)
         self.send_message(response)
 
     def list_levels(self, chatuser, *args):

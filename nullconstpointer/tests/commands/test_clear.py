@@ -60,7 +60,7 @@ class TestCommandClear(unittest.TestCase):
         self.test_processor.process_command(command)
         command = AddCommand(self.test_processor, "userA", "userA", "123-123-124")
         self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userB", "123-123-125")
+        command = AddCommand(self.test_processor, "userB", "userB", "123-123-125")
         self.test_processor.process_command(command)
         command = ClearCommand(self.test_processor, "userA")
         response = self.test_processor.process_command(command)

@@ -12,6 +12,7 @@ class Processor:
         self.current_owner = owner
         self.users = [self.current_owner]
         self.current_user = None
+        self.level_limit = 3
 
     def user_count(self):
         return len(self.users)

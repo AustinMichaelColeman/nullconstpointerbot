@@ -13,7 +13,7 @@ class TestLevels(unittest.TestCase):
         # Text allowed in level codes: 0-9 A-Z a-z except I O Z
         # ignore anything but 0-9, A-Z, a-z, except IiOoZz
         # ensure level length
-        level = Level("invalid_LEVEL_code0123456789-=}||test")
+        level = Level("invalid_LEVEL_code0123456789-=}||testfoo")
 
         self.assertFalse(level)
 
