@@ -29,6 +29,11 @@ class RemoveCommand(ICommand):
             f"to remove {level_code} submitted by {level_submitter_name}"
         )
 
+    def has_permission_to_remove(self, user):
+        return (
+            self.processor.is_mod_or_owner(self.caller_user) or self.caller_user == user
+        )
+
     def execute(self):
         if not self.level:
             return self.fail_remove_no_level_specified()
@@ -42,18 +47,16 @@ class RemoveCommand(ICommand):
                 if user_level != self.level:
                     continue
 
-                if (
-                    self.processor.is_mod_or_owner(self.caller_user)
-                    or self.caller_user == user
-                ):
-                    user.levels.remove(user_level)
+                if not self.has_permission_to_remove(user):
+                    return self.fail_remove_no_permission(
+                        self.caller_user, user, user_level
+                    )
 
-                    if user_level == self.processor.next_level():
-                        self.processor.current_user = None
+                user.levels.remove(user_level)
 
-                    return self.success_remove_user_level(user, user_level)
+                if user_level == self.processor.next_level():
+                    self.processor.current_user = None
 
-                return self.fail_remove_no_permission(
-                    self.caller_user, user, user_level
-                )
+                return self.success_remove_user_level(user, user_level)
+
         return self.fail_remove_level_not_found(level_fmt)
