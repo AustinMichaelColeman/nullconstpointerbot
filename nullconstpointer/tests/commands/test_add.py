@@ -13,14 +13,17 @@ class TestCommandAdd(unittest.TestCase):
         command = AddCommand(self.test_processor, "userA", "userA", "abc-def-ghd")
         response = self.test_processor.process_command(command)
 
-        self.assertEqual(response, command.success_add_user_level())
+        self.assertEqual(
+            response, command.success_add_user_level("userA", "ABC-DEF-GHD")
+        )
 
     def test_add_user_level_multiple_duplicate_levels_fails(self):
         command = AddCommand(self.test_processor, "userA", "userA", "abc-def-ghd")
         self.test_processor.process_command(command)
         response = self.test_processor.process_command(command)
         self.assertEqual(
-            response, command.fail_add_user_level_duplicate_code(),
+            response,
+            command.fail_add_user_level_duplicate_code("userA", "ABC-DEF-GHD", "userA"),
         )
 
     def test_add_user_level_multiple_different_levels_succeeds(self):
@@ -30,12 +33,12 @@ class TestCommandAdd(unittest.TestCase):
         response = self.test_processor.process_command(command)
 
         self.assertEqual(
-            response, command.success_add_user_level(),
+            response, command.success_add_user_level("userA", "ABC-DEF-GHA"),
         )
 
     def test_add_user_level_response_invalid(self):
         command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gh")
         response = self.test_processor.process_command(command)
         self.assertEqual(
-            response, command.fail_add_user_level_invalid_code(),
+            response, command.fail_add_user_level_invalid_code("userA", "abc-def-gh"),
         )
