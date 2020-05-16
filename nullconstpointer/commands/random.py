@@ -34,6 +34,5 @@ class RandomCommand(ICommand):
         random_user_index = random.randrange(0, len(users_with_levels))
         selected_user = users_with_levels[random_user_index]
 
-        self.processor.current_level = selected_user.next_level()
         self.processor.current_user = selected_user
-        return self.success_random_level(selected_user, self.processor.current_level)
+        return self.success_random_level(selected_user, self.processor.next_level())

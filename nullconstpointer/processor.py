@@ -7,7 +7,6 @@ class Processor:
         self.current_owner = owner
         self.users = [self.current_owner]
         self.current_user = None
-        self.current_level = None
 
     def user_count(self):
         return len(self.users)
@@ -29,6 +28,12 @@ class Processor:
             if user == username:
                 return user.is_mod_or_owner()
         return False
+
+    def next_level(self):
+        if not self.current_user:
+            return None
+
+        return self.current_user.next_level()
 
     def process_command(self, command):
         return command.execute()

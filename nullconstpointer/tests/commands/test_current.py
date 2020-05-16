@@ -6,6 +6,7 @@ from nullconstpointer.commands.add import AddCommand
 from nullconstpointer.commands.current import CurrentCommand
 from nullconstpointer.commands.next import NextCommand
 from nullconstpointer.commands.finish import FinishCommand
+from nullconstpointer.commands.remove import RemoveCommand
 
 
 class TestCommandCurrent(unittest.TestCase):
@@ -46,3 +47,28 @@ class TestCommandCurrent(unittest.TestCase):
         response = self.test_processor.process_command(command)
 
         self.assertEqual(response, command.success_current_level())
+
+    def test_remove_clears_current(self):
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
+        self.test_processor.process_command(command)
+        command = NextCommand(self.test_processor, self.test_owner)
+        self.test_processor.process_command(command)
+        command = RemoveCommand(self.test_processor, self.test_owner, "123-123-123")
+        self.test_processor.process_command(command)
+
+        command = CurrentCommand(self.test_processor)
+        response = self.test_processor.process_command(command)
+
+        self.assertEqual(response, command.fail_current_level_not_selected())
+
+    def test_finish_clears_current(self):
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
+        self.test_processor.process_command(command)
+        command = NextCommand(self.test_processor, self.test_owner)
+        self.test_processor.process_command(command)
+        command = FinishCommand(self.test_processor, self.test_owner)
+        self.test_processor.process_command(command)
+        command = CurrentCommand(self.test_processor)
+        response = self.test_processor.process_command(command)
+
+        self.assertEqual(response, command.fail_current_level_not_selected())

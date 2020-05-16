@@ -18,10 +18,10 @@ class FinishCommand(ICommand):
         if self.caller_name != self.processor.current_owner:
             return self.fail_finish_no_permission(self.caller_name)
 
-        if self.processor.current_level is None:
+        if self.processor.next_level() is None:
             return self.fail_finish_no_levels()
 
         command = RemoveCommand(
-            self.processor, self.caller_name, self.processor.current_level
+            self.processor, self.caller_name, self.processor.next_level()
         )
         return self.processor.process_command(command)
