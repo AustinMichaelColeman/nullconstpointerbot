@@ -52,10 +52,10 @@ class RemoveCommand(ICommand):
                         self.caller_user, user, user_level
                     )
 
-                user.levels.remove(user_level)
-
                 if user_level == self.processor.next_level():
                     self.processor.current_user = None
+
+                user.levels.remove(user_level)
 
                 return self.success_remove_user_level(user, user_level)
 

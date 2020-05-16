@@ -7,6 +7,8 @@ from nullconstpointer.commands.mod import ModCommand
 from nullconstpointer.commands.random import RandomCommand
 from nullconstpointer.commands.remove import RemoveCommand
 from nullconstpointer.commands.finish import FinishCommand
+from nullconstpointer.commands.next import NextCommand
+from nullconstpointer.commands.current import CurrentCommand
 
 
 class TestCommandFinish(unittest.TestCase):
@@ -66,3 +68,31 @@ class TestCommandFinish(unittest.TestCase):
         response = self.test_processor.process_command(command)
 
         self.assertEqual(response, command.fail_finish_no_permission("userA"))
+
+    def test_finish_clears_current_multiple_levels_same_user(self):
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
+        self.test_processor.process_command(command)
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-124")
+        self.test_processor.process_command(command)
+        command = NextCommand(self.test_processor, self.test_owner)
+        self.test_processor.process_command(command)
+        command = FinishCommand(self.test_processor, self.test_owner)
+        self.test_processor.process_command(command)
+        command = CurrentCommand(self.test_processor)
+        response = self.test_processor.process_command(command)
+
+        self.assertEqual(response, command.fail_current_level_not_selected())
+
+    def test_finish_clears_current_multiple_levels_different_user(self):
+        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
+        self.test_processor.process_command(command)
+        command = AddCommand(self.test_processor, "userB", "userB", "123-123-124")
+        self.test_processor.process_command(command)
+        command = NextCommand(self.test_processor, self.test_owner)
+        self.test_processor.process_command(command)
+        command = FinishCommand(self.test_processor, self.test_owner)
+        self.test_processor.process_command(command)
+        command = CurrentCommand(self.test_processor)
+        response = self.test_processor.process_command(command)
+
+        self.assertEqual(response, command.fail_current_level_not_selected())
