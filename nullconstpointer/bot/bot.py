@@ -25,6 +25,7 @@ from nullconstpointer.commands.clear import ClearCommand
 from nullconstpointer.commands.leave import LeaveCommand
 from nullconstpointer.commands.random import RandomCommand
 from nullconstpointer.commands.finish import FinishCommand
+from nullconstpointer.commands.timer import TimerCommand
 
 
 class Bot(SingleServerIRCBot):
@@ -58,6 +59,7 @@ class Bot(SingleServerIRCBot):
             "random": self.random,
             "finish": self.finish,
             "habits": self.habits,
+            "timer": self.timer,
         }
 
         url = f"https://api.twitch.tv/kraken/users?login={self.username}"
@@ -215,3 +217,17 @@ class Bot(SingleServerIRCBot):
 
     def habits(self, chatuser, *args):
         self.send_message("https://pastebin.com/WBMgKmDz")
+
+    def timer(self, chatuser, *args):
+        username = chatuser
+        command = None
+        if len(args) == 1:
+            for letter in args[0]:
+                if not letter.isdigit():
+                    self.send_message("Only enter an integer for the timer.")
+                    return
+            command = TimerCommand(self.cmdprocessor, username, args[0])
+        else:
+            command = TimerCommand(self.cmdprocessor, username, None)
+
+        self.send_message(self.cmdprocessor.process_command(command))

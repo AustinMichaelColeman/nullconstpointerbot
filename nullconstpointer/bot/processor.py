@@ -13,6 +13,13 @@ class Processor:
         self.users = [self.current_owner]
         self.current_user = None
         self.level_limit = 3
+        self.time_remaining = -1
+
+    def timer_has_been_set(self):
+        return self.time_remaining != -1
+
+    def start_timer(self, time):
+        self.time_remaining = time
 
     def user_count(self):
         return len(self.users)
