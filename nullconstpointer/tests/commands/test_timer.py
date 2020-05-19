@@ -86,3 +86,16 @@ class TestCommandTimer(unittest.TestCase):
         self.next()
         command, result = self.owner_calls_timer_no_args()
         self.assertEqual(result, command.fail_enter_a_timer_value())
+
+    def test_timer_finish_calls_success_time_expired(self):
+        self.create_level()
+        self.next()
+        self.owner_calls_timer()
+        self.test_processor.time_remaining = 0
+        command, result = self.owner_calls_timer_no_args()
+        self.assertEqual(
+            result,
+            command.success_time_expired(
+                self.test_processor.next_level(), self.test_processor.current_user
+            ),
+        )

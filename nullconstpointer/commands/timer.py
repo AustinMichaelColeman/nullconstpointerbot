@@ -23,7 +23,9 @@ class TimerCommand(ICommand):
         return message[:-1]
 
     def time_remaining(self):
-        minutes, seconds = divmod(self.processor.time_remaining, SECONDS_PER_MINUTE)
+        minutes, seconds = divmod(
+            self.processor.get_time_remaining(), SECONDS_PER_MINUTE
+        )
 
         minute_grammar = self.add_plural(MINUTE, minutes)
         second_grammar = self.add_plural(SECOND, seconds)
@@ -48,6 +50,9 @@ class TimerCommand(ICommand):
             f"Previous timer stopped. Starting new timer. "
             + self.success_time_remaining_message()
         )
+
+    def success_time_expired(self, level, user):
+        return f"Timer has expired for level {level} submitted by {user}"
 
     def success_starting_new_timer(self):
         return f"Starting new timer. {self.success_time_remaining_message()}"
@@ -82,6 +87,10 @@ class TimerCommand(ICommand):
 
             if self.processor.timer_has_been_set():
                 if not self.time_seconds:
+                    if self.processor.get_time_remaining() <= 0:
+                        return self.success_time_expired(
+                            self.processor.next_level(), self.processor.current_user
+                        )
                     return self.success_time_remaining_message()
                 self.start_timer()
                 return self.success_starting_new_timer_stopping_previous()
