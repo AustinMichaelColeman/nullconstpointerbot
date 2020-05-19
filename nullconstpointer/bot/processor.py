@@ -27,8 +27,7 @@ class Processor:
 
     def get_time_remaining(self):
         delta_seconds = (datetime.now() - self.time_started).seconds
-        self.time_remaining -= delta_seconds
-        return self.time_remaining
+        return self.time_remaining - delta_seconds
 
     def user_count(self):
         return len(self.users)
