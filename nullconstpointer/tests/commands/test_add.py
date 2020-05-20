@@ -4,247 +4,268 @@ from nullconstpointer.bot.processor import Processor
 from nullconstpointer.commands.add import AddCommand
 from nullconstpointer.commands.remove import RemoveCommand
 
+TEST_USER_A = "userA"
+TEST_USER_B = "userB"
+TEST_USER_C = "userC"
+
+LEVEL_INPUT_A = "aaa-aaa-aaa"
+LEVEL_EXPECTED_A = "AAA-AAA-AAA"
+
+LEVEL_INPUT_B = "bbb-bbb-bbb"
+LEVEL_EXPECTED_B = "BBB-BBB-BBB"
+
+LEVEL_INPUT_C = "ccc ccc ccc"
+LEVEL_EXPECTED_C = "CCC-CCC-CCC"
+
+LEVEL_INPUT_D = "ddd ddd ddd"
+LEVEL_EXPECTED_D = "DDD-DDD-DDD"
+
+LEVEL_INPUT_MULTIPLE_AB = "aaa aaa aaa bbb bbb bbb"
+LEVEL_INPUT_MULTIPLE_AB_EXPECTED = ["AAA-AAA-AAA", "BBB-BBB-BBB"]
+
+LEVEL_INPUT_MULTIPLE_BC = "bbb bbb bbb ccc ccc ccc"
+LEVEL_INPUT_MULTIPLE_BC_EXPECTED = ["BBB-BBB-BBB", "CCC-CCC-CCC"]
+
+LEVEL_INPUT_MULTIPLE_ABC = "aaa aaa aaa bbb bbb bbb ccc ccc ccc"
+LEVEL_INPUT_MULTIPLE_ABC_EXPECTED = ["AAA-AAA-AAA", "BBB-BBB-BBB", "CCC-CCC-CCC"]
+
+LEVEL_INPUT_MULTIPLE_BCD = "bbb bbb bbb ccc ccc ccc ddd ddd ddd"
+LEVEL_INPUT_MULTIPLE_BCD_EXPECTED = ["BBB-BBB-BBB", "CCC-CCC-CCC", "DDD-DDD-DDD"]
+
+LEVEL_INPUT_MULTIPLE_ABCD = "aaa aaa aaa bbb bbb bbb ccc ccc ccc ddd ddd ddd"
+
+LEVEL_INVALID_ONE = "abc-def-gh"
+LEVEL_INVALID_TWO = "aaa-aaa-aaa aaa aaa aai"
+LEVEL_INVALID_THREE_MIDDLE = "aaa-aaa-aaa bbb bbb bbi ccc ccc ccc"
+LEVEL_INVALID_THREE_MIDDLE_END = "aaa aaa aaa bbb bbb bbi ccc ccc cci"
+
 
 class TestCommandAdd(unittest.TestCase):
     def setUp(self):
         self.test_owner = User("test_owner", MOD_LEVEL_OWNER)
         self.test_processor = Processor(self.test_owner)
 
-    def test_add_user_level_response_valid(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-ghd")
+    def owner_add_level(self, levelcode):
+        command = AddCommand(
+            self.test_processor, self.test_owner, self.test_owner, LEVEL_INPUT_A
+        )
         response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def owner_add_level_a(self):
+        return self.owner_add_level(LEVEL_INPUT_A)
+
+    def owner_add_level_b(self):
+        return self.owner_add_level(LEVEL_INPUT_B)
+
+    def user_add_level(self, user, levelcode):
+        command = AddCommand(self.test_processor, user, user, levelcode)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def user_a_add_level(self, levelcode):
+        return self.user_add_level(TEST_USER_A, levelcode)
+
+    def user_a_add_level_a(self):
+        return self.user_a_add_level(LEVEL_INPUT_A)
+
+    def user_a_add_level_b(self):
+        return self.user_a_add_level(LEVEL_INPUT_B)
+
+    def user_a_add_level_c(self):
+        return self.user_a_add_level(LEVEL_INPUT_C)
+
+    def user_a_add_level_d(self):
+        return self.user_a_add_level(LEVEL_INPUT_D)
+
+    def user_a_add_invalid_code_one(self):
+        return self.user_a_add_level(LEVEL_INVALID_ONE)
+
+    def user_a_add_invalid_code_two(self):
+        return self.user_a_add_level(LEVEL_INVALID_TWO)
+
+    def user_a_add_invalid_code_three_middle(self):
+        return self.user_a_add_level(LEVEL_INVALID_THREE_MIDDLE)
+
+    def user_a_add_invalid_code_three_middle_end(self):
+        return self.user_a_add_level(LEVEL_INVALID_THREE_MIDDLE_END)
+
+    def user_a_add_multiple_ab(self):
+        return self.user_a_add_level(LEVEL_INPUT_MULTIPLE_AB)
+
+    def user_a_add_multiple_bc(self):
+        return self.user_a_add_level(LEVEL_INPUT_MULTIPLE_BC)
+
+    def user_a_add_multiple_abc(self):
+        return self.user_a_add_level(LEVEL_INPUT_MULTIPLE_ABC)
+
+    def user_a_add_multiple_bcd(self):
+        return self.user_a_add_level(LEVEL_INPUT_MULTIPLE_BCD)
+
+    def user_a_add_multiple_abcd(self):
+        return self.user_a_add_level(LEVEL_INPUT_MULTIPLE_ABCD)
+
+    def user_b_add_level(self, levelcode):
+        return self.user_add_level(TEST_USER_B, levelcode)
+
+    def user_b_add_level_a(self):
+        return self.user_b_add_level(LEVEL_INPUT_A)
+
+    def user_b_add_level_b(self):
+        return self.user_b_add_level(LEVEL_INPUT_B)
+
+    def user_b_add_level_c(self):
+        return self.user_b_add_level(LEVEL_INPUT_C)
+
+    def user_b_add_level_d(self):
+        return self.user_b_add_level(LEVEL_INPUT_D)
+
+    def user_a_remove_level(self, levelcode):
+        command = RemoveCommand(self.test_processor, TEST_USER_A, levelcode)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def user_a_remove_level_b(self):
+        return self.user_a_remove_level(LEVEL_INPUT_B)
+
+    def user_c_add_level(self, levelcode):
+        return self.user_add_level(TEST_USER_C, levelcode)
+
+    def user_c_add_multiple_abc(self):
+        return self.user_c_add_level(LEVEL_INPUT_MULTIPLE_ABC)
+
+    def test_add_user_level_response_valid(self):
+        command, response = self.user_a_add_level_a()
 
         self.assertEqual(
-            response, command.success_add_user_level("userA", "ABC-DEF-GHD")
+            response, command.success_add_user_level(TEST_USER_A, LEVEL_EXPECTED_A)
         )
 
     def test_add_user_level_multiple_duplicate_levels_fails(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-ghd")
-        self.test_processor.process_command(command)
-        response = self.test_processor.process_command(command)
+        self.user_a_add_level_a()
+        (command, response) = self.user_a_add_level_a()
+
         self.assertEqual(
             response,
-            command.fail_add_user_level_duplicate_code("userA", "ABC-DEF-GHD", "userA"),
+            command.fail_add_user_level_duplicate_code(
+                TEST_USER_A, LEVEL_EXPECTED_A, TEST_USER_A
+            ),
         )
 
     def test_add_user_level_multiple_different_levels_succeeds(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-ghd")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
-        response = self.test_processor.process_command(command)
+        self.user_a_add_level_a()
+        command, response = self.user_a_add_level_b()
 
         self.assertEqual(
-            response, command.success_add_user_level("userA", "ABC-DEF-GHA"),
+            response, command.success_add_user_level(TEST_USER_A, LEVEL_EXPECTED_B),
         )
 
     def test_add_user_level_response_invalid(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gh")
-        response = self.test_processor.process_command(command)
+        (command, response) = self.user_a_add_invalid_code_one()
         self.assertEqual(
-            response, command.fail_add_user_level_invalid_code("userA", "abc-def-gh"),
+            response,
+            command.fail_add_user_level_invalid_code(TEST_USER_A, LEVEL_INVALID_ONE),
         )
 
-    def test_two_levels_valid(self):
-        command = AddCommand(
-            self.test_processor, "userA", "userA", "abc def-ghd abc   ---def-gha"
-        )
-        response = self.test_processor.process_command(command)
-
-        levels_added = ["ABC-DEF-GHD", "ABC-DEF-GHA"]
-        self.assertEqual(
-            response, command.success_add_user_level("userA", levels_added)
-        )
-
-    def test_valid_with_invalid(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-ghd asdf")
-        response = self.test_processor.process_command(command)
+    def test_two_levels_simultaneous_valid(self):
+        (command, response) = self.user_a_add_multiple_ab()
 
         self.assertEqual(
             response,
-            command.fail_add_user_level_invalid_code("userA", "abc-def-ghd asdf"),
+            command.success_add_user_level(
+                TEST_USER_A, LEVEL_INPUT_MULTIPLE_AB_EXPECTED
+            ),
+        )
+
+    def test_one_valid_and_one_invalid_level_fails(self):
+        (command, response) = self.user_a_add_invalid_code_two()
+
+        self.assertEqual(
+            response,
+            command.fail_add_user_level_invalid_code(TEST_USER_A, LEVEL_INVALID_TWO),
         )
 
     def test_middle_invalid(self):
-        command = AddCommand(
-            self.test_processor, "userA", "userA", "123-123-123 asdf 321-321-321"
-        )
-        response = self.test_processor.process_command(command)
+        (command, response) = self.user_a_add_invalid_code_three_middle()
 
         self.assertEqual(
             response,
             command.fail_add_user_level_invalid_code(
-                "userA", "123-123-123 asdf 321-321-321"
+                TEST_USER_A, LEVEL_INVALID_THREE_MIDDLE
             ),
         )
 
     def test_end_and_middle_invalid(self):
-        command = AddCommand(
-            self.test_processor, "userA", "userA", "123-123-123 asdf 321-321-32I"
-        )
-        response = self.test_processor.process_command(command)
+        (command, response) = self.user_a_add_invalid_code_three_middle_end()
         self.assertEqual(
             response,
             command.fail_add_user_level_invalid_code(
-                "userA", "123-123-123 asdf 321-321-32I"
+                TEST_USER_A, LEVEL_INVALID_THREE_MIDDLE_END
             ),
         )
 
-    def test_spaces_in_level_code(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "123 123 123")
-        response = self.test_processor.process_command(command)
-
-        self.assertEqual(
-            response, command.success_add_user_level("userA", "123-123-123")
-        )
-
-    def test_spaces_in_level_code_multiple(self):
-        command = AddCommand(
-            self.test_processor, "userA", "userA", "123 123 123 abcdefghd"
-        )
-        response = self.test_processor.process_command(command)
-
-        valid_levels = ["123-123-123", "ABC-DEF-GHD"]
-
-        self.assertEqual(
-            response, command.success_add_user_level("userA", valid_levels)
-        )
-
-    def test_extra_character_in_level_codes(self):
-        command = AddCommand(
-            self.test_processor,
-            "userA",
-            "userA",
-            "123-123--123 ----32--1 123 _--...123",
-        )
-        response = self.test_processor.process_command(command)
-
-        valid_levels = ["123-123-123", "321-123-123"]
-
-        self.assertEqual(
-            response, command.success_add_user_level("userA", valid_levels)
-        )
-
     def test_level_limit(self):
-        command = AddCommand(
-            self.test_processor,
-            "userA",
-            "userA",
-            "111-111-111 222-222-222 333-333-333 444-444-444",
-        )
-        response = self.test_processor.process_command(command)
+        (command, response) = self.user_a_add_multiple_abcd()
 
-        self.assertEqual(response, command.fail_add_user_level_level_limit("userA"))
+        self.assertEqual(response, command.fail_add_user_level_level_limit(TEST_USER_A))
 
     def test_limit_one_at_a_time_fails_past_limit(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "123 123 121")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userA", "123 123 122")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userA", "123 123 123")
-        response = self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userA", "123 123 124")
-        response = self.test_processor.process_command(command)
+        self.user_a_add_level_a()
+        self.user_a_add_level_b()
+        self.user_a_add_level_c()
+        (command, response) = self.user_a_add_level_d()
 
-        self.assertEqual(response, command.fail_add_user_level_level_limit("userA"))
+        self.assertEqual(response, command.fail_add_user_level_level_limit(TEST_USER_A))
 
     def test_limit_one_at_a_time_succeeds_at_limit(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "123 123 121")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userA", "123 123 122")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userA", "123 123 123")
-        response = self.test_processor.process_command(command)
+        self.user_a_add_level_a()
+        self.user_a_add_level_b()
+        (command, response) = self.user_a_add_level_c()
 
         self.assertEqual(
-            response, command.success_add_user_level("userA", "123-123-123")
-        )
-
-    def test_limit_one_at_a_time_succeeds_at_limit_owner(self):
-        command = AddCommand(
-            self.test_processor, self.test_owner, self.test_owner, "123 123 121"
-        )
-        self.test_processor.process_command(command)
-        command = AddCommand(
-            self.test_processor, self.test_owner, self.test_owner, "123 123 122"
-        )
-        self.test_processor.process_command(command)
-        command = AddCommand(
-            self.test_processor, self.test_owner, self.test_owner, "123 123 123"
-        )
-        response = self.test_processor.process_command(command)
-
-        self.assertEqual(
-            response, command.success_add_user_level(self.test_owner, "123-123-123")
+            response, command.success_add_user_level(TEST_USER_A, LEVEL_EXPECTED_C)
         )
 
     def test_limit_after_removal(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "123 123 121")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userA", "123 123 122")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userA", "123 123 123")
-        self.test_processor.process_command(command)
-        command = RemoveCommand(self.test_processor, "userA", "123 123 122")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userA", "123 123 122")
-        response = self.test_processor.process_command(command)
+        self.user_a_add_level_a()
+        self.user_a_add_level_b()
+        self.user_a_add_level_c()
 
-        valid_levels = ["123-123-122"]
+        self.user_a_remove_level_b()
+
+        (command, response) = self.user_a_add_level_b()
+
         self.assertEqual(
-            response, command.success_add_user_level("userA", valid_levels)
+            response, command.success_add_user_level(TEST_USER_A, LEVEL_EXPECTED_B)
         )
 
     def test_limit_one_then_multi(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "123 123 121")
-        self.test_processor.process_command(command)
-        command = AddCommand(
-            self.test_processor, "userA", "userA", "111-111-111 111-111-112 111-111-113"
-        )
-        response = self.test_processor.process_command(command)
+        self.user_a_add_level_a()
+        (command, response) = self.user_a_add_multiple_bcd()
 
         self.assertEqual(
-            response, command.fail_add_user_level_level_limit("userA"),
+            response, command.fail_add_user_level_level_limit(TEST_USER_A),
         )
 
     def test_limit_duplicate_multi(self):
-        command = AddCommand(
-            self.test_processor, "userA", "userA", "123-123-123 333-333-333"
-        )
-        self.test_processor.process_command(command)
-        command = AddCommand(
-            self.test_processor, "userA", "userA", "111-111-111 333-333-333 222-222-222"
-        )
-        response = self.test_processor.process_command(command)
+        self.user_a_add_multiple_bc()
+        (command, response) = self.user_a_add_multiple_abc()
 
         self.assertEqual(
             response,
-            command.fail_add_user_level_duplicate_code("userA", "333-333-333", "userA"),
+            command.fail_add_user_level_duplicate_code(
+                TEST_USER_A, LEVEL_EXPECTED_B, TEST_USER_A
+            ),
         )
 
     def test_limit_duplicate_multi_user(self):
-        command = AddCommand(self.test_processor, "userB", "userB", "222-222-222")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userA", "111-111-111")
-        self.test_processor.process_command(command)
-        command = AddCommand(
-            self.test_processor, "userC", "userC", "111-111-111 222-222-222 333-333-333"
-        )
-        response = self.test_processor.process_command(command)
+        self.user_b_add_level_b()
+        self.user_a_add_level_a()
+        (command, response) = self.user_c_add_multiple_abc()
 
         self.assertEqual(
             response,
-            command.fail_add_user_level_duplicate_code("userC", "111-111-111", "userA"),
-        )
-
-    def test_partial_submission(self):
-        command = AddCommand(
-            self.test_processor, "userA", "userA", "111-111-111 222-222-22 abc-def-ghd"
-        )
-        response = self.test_processor.process_command(command)
-
-        self.assertEqual(
-            response,
-            command.fail_add_user_level_invalid_code(
-                "userA", "111-111-111 222-222-22 abc-def-ghd"
+            command.fail_add_user_level_duplicate_code(
+                TEST_USER_C, LEVEL_EXPECTED_A, TEST_USER_A
             ),
         )
