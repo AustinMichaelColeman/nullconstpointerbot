@@ -129,3 +129,6 @@ dmypy.json
 
 # for authentication
 keys.py
+
+# todo list
+TODO
