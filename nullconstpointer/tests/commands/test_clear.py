@@ -1,69 +1,57 @@
 import unittest
 
-from nullconstpointer.bot.user import User, MOD_LEVEL_OWNER
-from nullconstpointer.bot.processor import Processor
-from nullconstpointer.commands.add import AddCommand
-from nullconstpointer.commands.mod import ModCommand
-from nullconstpointer.commands.clear import ClearCommand
+from nullconstpointer.tests.helper import TestHelper
 
 
 class TestCommandClear(unittest.TestCase):
     def setUp(self):
-        self.test_owner = User("test_owner", MOD_LEVEL_OWNER)
-        self.test_processor = Processor(self.test_owner)
+        self.test_helper = TestHelper()
 
-    def test_clear_called_by_owner_without_levels(self):
-        command = ClearCommand(self.test_processor, self.test_owner)
-        response = self.test_processor.process_command(command)
+    def test_clear_called_by_owner(self):
+        command, response = self.test_helper.owner_calls_clear()
 
         self.assertEqual(response, command.success_clear_owner())
 
     def test_clear_called_by_owner_with_levels(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userA", "123-123-124")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userB", "123-123-126")
-        self.test_processor.process_command(command)
+        self.test_helper.user_a_add_level_a()
+        self.test_helper.user_a_add_level_b()
+        self.test_helper.user_b_add_level_c()
 
-        command = ClearCommand(self.test_processor, self.test_owner)
-        response = self.test_processor.process_command(command)
+        command, response = self.test_helper.owner_calls_clear()
 
         self.assertEqual(response, command.success_clear_owner())
 
     def test_clear_called_by_mod_without_levels(self):
-        command = ModCommand(self.test_processor, self.test_owner, "userA")
-        self.test_processor.process_command(command)
-        command = ClearCommand(self.test_processor, "userA")
-        response = self.test_processor.process_command(command)
+        self.test_helper.owner_calls_mod_user_a()
+        command, response = self.test_helper.user_a_calls_clear()
 
-        self.assertEqual(response, command.fail_clear_user_no_levels("userA"))
+        self.assertEqual(
+            response, command.fail_clear_user_no_levels(self.test_helper.TEST_USER_A)
+        )
 
     def test_clear_called_by_mod_with_levels(self):
-        command = ModCommand(self.test_processor, self.test_owner, "userA")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
-        self.test_processor.process_command(command)
-        command = ClearCommand(self.test_processor, "userA")
-        response = self.test_processor.process_command(command)
+        self.test_helper.owner_calls_mod_user_a()
+        self.test_helper.user_a_add_level_a()
+        command, response = self.test_helper.user_a_calls_clear()
 
-        self.assertEqual(response, command.success_clear_user("userA"))
+        self.assertEqual(
+            response, command.success_clear_user(self.test_helper.TEST_USER_A)
+        )
 
     def test_clear_called_by_user_without_levels(self):
-        command = ClearCommand(self.test_processor, "userA")
-        response = self.test_processor.process_command(command)
+        command, response = self.test_helper.user_a_calls_clear()
 
-        self.assertEqual(response, command.fail_clear_user_no_levels("userA"))
+        self.assertEqual(
+            response, command.fail_clear_user_no_levels(self.test_helper.TEST_USER_A)
+        )
 
     def test_clear_called_by_user_with_levels(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userA", "123-123-124")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userB", "userB", "123-123-125")
-        self.test_processor.process_command(command)
-        command = ClearCommand(self.test_processor, "userA")
-        response = self.test_processor.process_command(command)
+        self.test_helper.user_a_add_level_a()
+        self.test_helper.user_a_add_level_b()
+        self.test_helper.user_b_add_level_c()
+        command, response = self.test_helper.user_a_calls_clear()
 
-        self.assertEqual(response, command.success_clear_user("userA"))
-        self.assertEqual(self.test_processor.level_count(), 1)
+        self.assertEqual(
+            response, command.success_clear_user(self.test_helper.TEST_USER_A)
+        )
+        self.assertEqual(self.test_helper.test_processor.level_count(), 1)

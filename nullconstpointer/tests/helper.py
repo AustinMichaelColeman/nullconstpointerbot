@@ -2,6 +2,8 @@ from nullconstpointer.bot.user import User, MOD_LEVEL_OWNER
 from nullconstpointer.bot.processor import Processor
 from nullconstpointer.commands.add import AddCommand
 from nullconstpointer.commands.remove import RemoveCommand
+from nullconstpointer.commands.clear import ClearCommand
+from nullconstpointer.commands.mod import ModCommand
 
 
 class TestHelper:
@@ -141,3 +143,24 @@ class TestHelper:
 
     def user_c_add_multiple_abc(self):
         return self.user_c_add_level(self.LEVEL_INPUT_MULTIPLE_ABC)
+
+    def owner_calls_clear(self):
+        command = ClearCommand(self.test_processor, self.test_owner)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def user_calls_clear(self, username):
+        command = ClearCommand(self.test_processor, username)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def user_a_calls_clear(self):
+        return self.user_calls_clear(self.TEST_USER_A)
+
+    def owner_calls_mod(self, username):
+        command = ModCommand(self.test_processor, self.test_owner, username)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def owner_calls_mod_user_a(self):
+        return self.owner_calls_mod(self.TEST_USER_A)
