@@ -9,6 +9,7 @@ from nullconstpointer.commands.next import NextCommand
 from nullconstpointer.commands.finish import FinishCommand
 from nullconstpointer.commands.random import RandomCommand
 from nullconstpointer.commands.leave import LeaveCommand
+from nullconstpointer.commands.list import ListCommand
 
 
 class TestHelper:
@@ -211,5 +212,10 @@ class TestHelper:
 
     def owner_calls_random(self):
         command = RandomCommand(self.test_processor, self.test_owner)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def list_called(self):
+        command = ListCommand(self.test_processor)
         response = self.test_processor.process_command(command)
         return (command, response)

@@ -1,26 +1,19 @@
 import unittest
 
-from nullconstpointer.bot.user import User, MOD_LEVEL_OWNER
-from nullconstpointer.bot.processor import Processor
-from nullconstpointer.commands.list import ListCommand
-from nullconstpointer.commands.add import AddCommand
+from nullconstpointer.tests.helper import TestHelper
 
 
 class TestCommandList(unittest.TestCase):
     def setUp(self):
-        self.test_owner = User("test_owner", MOD_LEVEL_OWNER)
-        self.test_processor = Processor(self.test_owner)
+        self.test_helper = TestHelper()
 
     def test_list_levels_empty(self):
-        command = ListCommand(self.test_processor)
-        response = self.test_processor.process_command(command)
+        command, response = self.test_helper.list_called()
+
         self.assertEqual(response, command.success_list_empty())
 
     def test_list_levels_one_user_one_level(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userA", "abc-def-gha")
-        self.test_processor.process_command(command)
-        command = ListCommand(self.test_processor)
-        response = self.test_processor.process_command(command)
+        self.test_helper.user_a_add_level_a()
+        self.test_helper.user_a_add_level_b()
+        command, response = self.test_helper.list_called()
         self.assertEqual(response, command.success_list())
