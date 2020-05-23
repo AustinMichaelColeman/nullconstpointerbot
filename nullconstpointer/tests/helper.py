@@ -4,6 +4,9 @@ from nullconstpointer.commands.add import AddCommand
 from nullconstpointer.commands.remove import RemoveCommand
 from nullconstpointer.commands.clear import ClearCommand
 from nullconstpointer.commands.mod import ModCommand
+from nullconstpointer.commands.current import CurrentCommand
+from nullconstpointer.commands.next import NextCommand
+from nullconstpointer.commands.finish import FinishCommand
 
 
 class TestHelper:
@@ -162,5 +165,28 @@ class TestHelper:
         response = self.test_processor.process_command(command)
         return (command, response)
 
+    def current_called(self):
+        command = CurrentCommand(self.test_processor)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
     def owner_calls_mod_user_a(self):
         return self.owner_calls_mod(self.TEST_USER_A)
+
+    def owner_calls_next(self):
+        command = NextCommand(self.test_processor, self.test_owner)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def owner_calls_finish(self):
+        command = FinishCommand(self.test_processor, self.test_owner)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def owner_calls_remove(self, level):
+        command = RemoveCommand(self.test_processor, self.test_owner, level)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def owner_calls_remove_level_a(self):
+        return self.owner_calls_remove(self.LEVEL_INPUT_A)
