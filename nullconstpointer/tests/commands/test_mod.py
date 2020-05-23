@@ -1,49 +1,36 @@
 import unittest
 
-from nullconstpointer.bot.user import User, MOD_LEVEL_OWNER
-from nullconstpointer.bot.processor import Processor
-from nullconstpointer.commands.mod import ModCommand
-from nullconstpointer.commands.unmod import UnmodCommand
+from nullconstpointer.tests.helper import TestHelper
 
 
 class TestCommandMod(unittest.TestCase):
     def setUp(self):
-        self.test_owner = User("test_owner", MOD_LEVEL_OWNER)
-        self.test_processor = Processor(self.test_owner)
+        self.test_helper = TestHelper()
 
     def test_mod_success(self):
-        command = ModCommand(self.test_processor, self.test_owner, "userB")
-        response = self.test_processor.process_command(command)
+        command, response = self.test_helper.owner_calls_mod_user_a()
 
-        self.assertEqual(response, command.success_mod("userB"))
+        self.assertEqual(response, command.success_mod(self.test_helper.TEST_USER_A))
 
     def test_mod_fail_none_specified(self):
-        command = ModCommand(self.test_processor, self.test_owner, "")
-        response = self.test_processor.process_command(command)
+        command, response = self.test_helper.owner_calls_mod_empty()
 
         self.assertEqual(response, command.fail_mod_none_specified())
 
     def test_mod_fail_when_user_to_mod_none_as_owner(self):
-        command = ModCommand(self.test_processor, self.test_owner, None)
-        response = self.test_processor.process_command(command)
+        command, response = self.test_helper.owner_calls_mod_empty()
+
         self.assertEqual(response, command.fail_mod_none_specified())
 
     def test_mod_fail_when_user_to_mod_none_as_mod(self):
-        command = ModCommand(self.test_processor, self.test_owner, "userA")
-        self.test_processor.process_command(command)
-        command = ModCommand(self.test_processor, "userA", None)
-        response = self.test_processor.process_command(command)
+        self.test_helper.owner_calls_mod_user_a()
+        command, response = self.test_helper.user_a_calls_mod_none()
 
         self.assertEqual(response, command.fail_mod_not_owner())
 
     def test_mod_fail_when_user_to_mod_none_as_user(self):
-        command = ModCommand(self.test_processor, self.test_owner, "userA")
-        self.test_processor.process_command(command)
-
-        command = UnmodCommand(self.test_processor, self.test_owner, "userA")
-        self.test_processor.process_command(command)
-
-        command = ModCommand(self.test_processor, "userA", None)
-        response = self.test_processor.process_command(command)
+        self.test_helper.owner_calls_mod_user_a()
+        self.test_helper.owner_calls_unmod_user_a()
+        command, response = self.test_helper.user_a_calls_mod_none()
 
         self.assertEqual(response, command.fail_mod_not_owner())

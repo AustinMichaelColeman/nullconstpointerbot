@@ -10,6 +10,7 @@ from nullconstpointer.commands.finish import FinishCommand
 from nullconstpointer.commands.random import RandomCommand
 from nullconstpointer.commands.leave import LeaveCommand
 from nullconstpointer.commands.list import ListCommand
+from nullconstpointer.commands.unmod import UnmodCommand
 
 
 class TestHelper:
@@ -184,6 +185,22 @@ class TestHelper:
         response = self.test_processor.process_command(command)
         return (command, response)
 
+    def user_calls_mod(self, invoker, user_to_mod):
+        command = ModCommand(self.test_processor, invoker, user_to_mod)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def user_a_calls_mod_none(self):
+        return self.user_calls_mod(self.TEST_USER_A, None)
+
+    def owner_calls_unmod(self, username):
+        command = UnmodCommand(self.test_processor, self.test_owner, username)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def owner_calls_unmod_user_a(self):
+        return self.owner_calls_unmod(self.TEST_USER_A)
+
     def current_called(self):
         command = CurrentCommand(self.test_processor)
         response = self.test_processor.process_command(command)
@@ -191,6 +208,12 @@ class TestHelper:
 
     def owner_calls_mod_user_a(self):
         return self.owner_calls_mod(self.TEST_USER_A)
+
+    def owner_calls_mod_empty(self):
+        return self.owner_calls_mod("")
+
+    def owner_calls_mod_none(self):
+        return self.owner_calls_mod(None)
 
     def owner_calls_next(self):
         command = NextCommand(self.test_processor, self.test_owner)
