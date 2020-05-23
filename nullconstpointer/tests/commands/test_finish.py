@@ -1,98 +1,75 @@
 import unittest
 
-from nullconstpointer.bot.user import User, MOD_LEVEL_OWNER
-from nullconstpointer.bot.processor import Processor
-from nullconstpointer.commands.add import AddCommand
-from nullconstpointer.commands.mod import ModCommand
-from nullconstpointer.commands.random import RandomCommand
-from nullconstpointer.commands.remove import RemoveCommand
-from nullconstpointer.commands.finish import FinishCommand
-from nullconstpointer.commands.next import NextCommand
-from nullconstpointer.commands.current import CurrentCommand
+from nullconstpointer.tests.helper import TestHelper
 
 
 class TestCommandFinish(unittest.TestCase):
     def setUp(self):
-        self.test_owner = User("test_owner", MOD_LEVEL_OWNER)
-        self.test_processor = Processor(self.test_owner)
+        self.test_helper = TestHelper()
 
     def test_finish_called_by_owner_no_levels(self):
-        command = FinishCommand(self.test_processor, self.test_owner)
-        response = self.test_processor.process_command(command)
+        command, response = self.test_helper.owner_calls_finish()
 
         self.assertEqual(response, command.fail_finish_no_levels())
 
     def test_finish_called_by_owner_with_levels(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
-        self.test_processor.process_command(command)
-        command = RandomCommand(self.test_processor, self.test_owner)
-        self.test_processor.process_command(command)
-        command = FinishCommand(self.test_processor, self.test_owner)
-        response = self.test_processor.process_command(command)
+        self.test_helper.user_a_add_level_a()
+        self.test_helper.owner_calls_random()
+        command, response = self.test_helper.owner_calls_finish()
 
-        # hack for now, make success_remove_user_level not require an object to call it
-        # in the future
-        removeCommand = RemoveCommand(self.test_processor, "userA", "123-123-123")
         self.assertEqual(
-            response, removeCommand.success_remove_user_level("userA", "123-123-123"),
+            response,
+            command.success_remove_user_level(
+                self.test_helper.TEST_USER_A, self.test_helper.LEVEL_EXPECTED_A
+            ),
         )
 
     def test_finish_called_by_user_with_levels(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
-        self.test_processor.process_command(command)
-        command = FinishCommand(self.test_processor, "userA")
-        response = self.test_processor.process_command(command)
+        self.test_helper.user_a_add_level_a()
+        command, response = self.test_helper.user_a_calls_finish()
 
-        self.assertEqual(response, command.fail_finish_no_permission("userA"))
+        self.assertEqual(
+            response, command.fail_finish_no_permission(self.test_helper.TEST_USER_A)
+        )
 
     def test_finish_called_by_user_without_levels(self):
-        command = FinishCommand(self.test_processor, "userA")
-        response = self.test_processor.process_command(command)
+        command, response = self.test_helper.user_a_calls_finish()
 
-        self.assertEqual(response, command.fail_finish_no_permission("userA"))
+        self.assertEqual(
+            response, command.fail_finish_no_permission(self.test_helper.TEST_USER_A)
+        )
 
     def test_finish_called_by_mod_with_levels(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
-        self.test_processor.process_command(command)
-        command = ModCommand(self.test_processor, self.test_owner, "userA")
-        self.test_processor.process_command(command)
-        command = FinishCommand(self.test_processor, "userA")
-        response = self.test_processor.process_command(command)
+        self.test_helper.user_a_add_level_a()
+        self.test_helper.owner_calls_mod_user_a()
+        command, response = self.test_helper.user_a_calls_finish()
 
-        self.assertEqual(response, command.fail_finish_no_permission("userA"))
+        self.assertEqual(
+            response, command.fail_finish_no_permission(self.test_helper.TEST_USER_A)
+        )
 
     def test_finish_called_by_mod_without_levels(self):
-        command = ModCommand(self.test_processor, self.test_owner, "userA")
-        self.test_processor.process_command(command)
-        command = FinishCommand(self.test_processor, "userA")
-        response = self.test_processor.process_command(command)
+        self.test_helper.owner_calls_mod_user_a()
+        command, response = self.test_helper.user_a_calls_finish()
 
-        self.assertEqual(response, command.fail_finish_no_permission("userA"))
+        self.assertEqual(
+            response, command.fail_finish_no_permission(self.test_helper.TEST_USER_A)
+        )
 
-    def test_finish_clears_current_multiple_levels_same_user(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userA", "userA", "123-123-124")
-        self.test_processor.process_command(command)
-        command = NextCommand(self.test_processor, self.test_owner)
-        self.test_processor.process_command(command)
-        command = FinishCommand(self.test_processor, self.test_owner)
-        self.test_processor.process_command(command)
-        command = CurrentCommand(self.test_processor)
-        response = self.test_processor.process_command(command)
+    def test_current_has_correct_output_after_finish_same_user(self):
+        self.test_helper.user_a_add_level_a()
+        self.test_helper.user_a_add_level_b()
+        self.test_helper.owner_calls_next()
+        self.test_helper.owner_calls_finish()
+        command, response = self.test_helper.current_called()
 
         self.assertEqual(response, command.fail_current_level_not_selected())
 
-    def test_finish_clears_current_multiple_levels_different_user(self):
-        command = AddCommand(self.test_processor, "userA", "userA", "123-123-123")
-        self.test_processor.process_command(command)
-        command = AddCommand(self.test_processor, "userB", "userB", "123-123-124")
-        self.test_processor.process_command(command)
-        command = NextCommand(self.test_processor, self.test_owner)
-        self.test_processor.process_command(command)
-        command = FinishCommand(self.test_processor, self.test_owner)
-        self.test_processor.process_command(command)
-        command = CurrentCommand(self.test_processor)
-        response = self.test_processor.process_command(command)
+    def test_current_has_correct_output_after_finish_different_user(self):
+        self.test_helper.user_a_add_level_a()
+        self.test_helper.user_b_add_level_b()
+        self.test_helper.owner_calls_next()
+        self.test_helper.owner_calls_finish()
+        command, response = self.test_helper.current_called()
 
         self.assertEqual(response, command.fail_current_level_not_selected())

@@ -7,6 +7,12 @@ class FinishCommand(ICommand):
     def __init__(self, processor, caller_name):
         self.processor = processor
         self.caller_name = caller_name
+        self.remove_command = RemoveCommand(
+            self.processor, self.caller_name, self.processor.next_level()
+        )
+
+    def success_remove_user_level(self, user, level):
+        return self.remove_command.success_remove_user_level(user, level)
 
     def fail_finish_no_levels(self):
         return "There are no levels currently selected."
