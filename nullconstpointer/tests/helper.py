@@ -246,6 +246,14 @@ class TestHelper:
         response = self.test_processor.process_command(command)
         return (command, response)
 
+    def user_calls_random(self, user):
+        command = RandomCommand(self.test_processor, user)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def user_a_calls_random(self):
+        return self.user_calls_random(self.TEST_USER_A)
+
     def list_called(self):
         command = ListCommand(self.test_processor)
         response = self.test_processor.process_command(command)
