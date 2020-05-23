@@ -8,6 +8,7 @@ from nullconstpointer.commands.current import CurrentCommand
 from nullconstpointer.commands.next import NextCommand
 from nullconstpointer.commands.finish import FinishCommand
 from nullconstpointer.commands.random import RandomCommand
+from nullconstpointer.commands.leave import LeaveCommand
 
 
 class TestHelper:
@@ -168,6 +169,14 @@ class TestHelper:
 
     def user_a_calls_finish(self):
         return self.user_calls_finish(self.TEST_USER_A)
+
+    def user_calls_leave(self, user):
+        command = LeaveCommand(self.test_processor, user)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def user_a_calls_leave(self):
+        return self.user_calls_leave(self.TEST_USER_A)
 
     def owner_calls_mod(self, username):
         command = ModCommand(self.test_processor, self.test_owner, username)
