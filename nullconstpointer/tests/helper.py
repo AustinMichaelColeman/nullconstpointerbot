@@ -242,6 +242,23 @@ class TestHelper:
     def owner_calls_unmod_user_a(self):
         return self.owner_calls_unmod(self.TEST_USER_A)
 
+    def owner_calls_unmod_none(self):
+        return self.owner_calls_unmod(None)
+
+    def user_calls_unmod(self, invoker, username):
+        command = UnmodCommand(self.test_processor, invoker, username)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def user_a_calls_unmod(self, username):
+        return self.user_calls_unmod(self.TEST_USER_A, username)
+
+    def user_a_calls_unmod_none(self):
+        return self.user_a_calls_unmod(None)
+
+    def user_a_calls_unmod_user_a(self):
+        return self.user_a_calls_unmod(self.TEST_USER_A)
+
     def current_called(self):
         command = CurrentCommand(self.test_processor)
         response = self.test_processor.process_command(command)
