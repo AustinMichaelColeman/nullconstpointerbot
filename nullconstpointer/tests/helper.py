@@ -142,8 +142,17 @@ class TestHelper:
         response = self.test_processor.process_command(command)
         return (command, response)
 
+    def user_a_remove_level_empty(self):
+        return self.user_a_remove_level("")
+
+    def user_a_remove_level_invalid_one(self):
+        return self.user_a_remove_level(self.LEVEL_INVALID_ONE)
+
     def user_a_remove_level_b(self):
         return self.user_a_remove_level(self.LEVEL_INPUT_B)
+    
+    def user_a_remove_level_none(self):
+        return self.user_a_remove_level(None)
 
     def user_c_add_level(self, levelcode):
         return self.user_add_level(self.TEST_USER_C, levelcode)
@@ -240,6 +249,9 @@ class TestHelper:
 
     def owner_calls_remove_level_a(self):
         return self.owner_calls_remove(self.LEVEL_INPUT_A)
+
+    def owner_calls_remove_none(self):
+        return self.owner_calls_remove(None)
 
     def owner_calls_random(self):
         command = RandomCommand(self.test_processor, self.test_owner)
