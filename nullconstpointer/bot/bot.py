@@ -60,6 +60,7 @@ class Bot(SingleServerIRCBot):
             "finish": self.finish,
             "habits": self.habits,
             "timer": self.timer,
+            "queue": self.list_levels,
         }
 
         url = f"https://api.twitch.tv/kraken/users?login={self.username}"
