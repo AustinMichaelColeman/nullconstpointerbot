@@ -47,20 +47,23 @@ class Bot(SingleServerIRCBot):
             "add": self.add,
             "github": self.github,
             "list": self.list_levels,
-            "nextlevel": self.next_level,
-            "next": self.next_level,
             "current": self.current_level,
             "currentlevel": self.current_level,
-            "mod": self.mod,
-            "unmod": self.unmod,
-            "remove": self.remove,
             "leave": self.leave,
             "clear": self.clear,
-            "random": self.random,
-            "finish": self.finish,
             "habits": self.habits,
             "timer": self.timer,
             "queue": self.list_levels,
+            "help": self.help,
+        }
+        self.mod_cmds = {
+            "nextlevel": self.next_level,
+            "next": self.next_level,
+            "mod": self.mod,
+            "unmod": self.unmod,
+            "remove": self.remove,
+            "random": self.random,
+            "finish": self.finish,
         }
 
         url = f"https://api.twitch.tv/kraken/users?login={self.username}"
@@ -105,31 +108,34 @@ class Bot(SingleServerIRCBot):
     def process(self, user, message):
         if message.startswith(self.prefix):
             cmd = message.split(" ")[0][len(self.prefix) :]
+            cmd = cmd.lower()
             args = message.split(" ")[1:]
-            self.perform(user, cmd, *args)
+            if self.contains_invalid_characters(cmd):
+                self.send_message(self.unregistered_command(user, cmd))
+            elif cmd in self.mod_cmds.keys():
+                self.perform(user, self.mod_cmds[cmd], *args)
+            elif cmd in self.cmds.keys():
+                self.perform(user, self.cmds[cmd], *args)
+            else:
+                self.send_message(self.unregistered_command(user, cmd))
 
     def unregistered_command(self, user, cmd):
         return f'{user}, "{cmd}" isn\'t a registered command.'
 
-    def perform(self, user, cmd, *args):
-        if self.contains_invalid_characters(cmd):
-            self.send_message(self.unregistered_command(user, cmd))
+    def perform(self, user, func, *args):
+        func(user, *args)
 
-        for name, func in self.cmds.items():
-            if cmd.upper() == name.upper():
-                func(user, *args)
-                return
+    def help(self, chatuser, *args):
+        commands_to_show = list(self.cmds.keys())
 
-        if cmd.upper() == "HELP":
-            self.help(self.prefix, self.cmds)
+        for user in self.cmdprocessor.users:
+            if chatuser == user:
+                if user.is_mod_or_owner():
+                    commands_to_show += list(self.mod_cmds.keys())
 
-        else:
-            self.send_message(self.unregistered_command(user, cmd))
-
-    def help(self, prefix, cmds):
         self.send_message(
             "Hi. I'm a Mario Maker 2 Twitch chat bot. Registered commands: "
-            + ", ".join([f"{prefix}{cmd}" for cmd in sorted(cmds.keys())])
+            + ", ".join([f"{self.prefix}{cmd}" for cmd in sorted(commands_to_show)])
         )
 
     def hello(self, chatuser, *args):
