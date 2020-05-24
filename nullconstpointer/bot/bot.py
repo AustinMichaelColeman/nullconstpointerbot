@@ -138,10 +138,14 @@ class Bot(SingleServerIRCBot):
     def friendcode(self, chatuser, *args):
         self.send_message(f"Add me on your switch! My friend code is SW-2444-3895-1309")
 
-    def add(self, chatuser, *args):
+    def args_to_arg_str(self, args):
         argstr = ""
         for arg in args:
             argstr += arg
+        return argstr
+
+    def add(self, chatuser, *args):
+        argstr = self.args_to_arg_str(args)
 
         command = AddCommand(self.cmdprocessor, chatuser, chatuser, argstr)
         response = self.cmdprocessor.process_command(command)
@@ -203,7 +207,8 @@ class Bot(SingleServerIRCBot):
 
     def clear(self, chatuser, *args):
         username = chatuser
-        command = ClearCommand(self.cmdprocessor, username)
+        argstr = self.args_to_arg_str(args)
+        command = ClearCommand(self.cmdprocessor, username, argstr)
         self.send_message(self.cmdprocessor.process_command(command))
 
     def random(self, chatuser, *args):

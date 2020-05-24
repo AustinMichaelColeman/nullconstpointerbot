@@ -164,10 +164,16 @@ class TestHelper:
     def user_c_add_multiple_abc(self):
         return self.user_c_add_level(self.LEVEL_INPUT_MULTIPLE_ABC)
 
-    def owner_calls_clear(self):
-        command = ClearCommand(self.test_processor, self.test_owner)
+    def owner_calls_clear(self, user_to_clear):
+        command = ClearCommand(self.test_processor, self.test_owner, user_to_clear)
         response = self.test_processor.process_command(command)
         return (command, response)
+
+    def owner_calls_clear_no_args(self):
+        return self.owner_calls_clear("")
+
+    def owner_calls_clear_user_a(self):
+        return self.owner_calls_clear(self.TEST_USER_A)
 
     def owner_calls_timer(self):
         command = TimerCommand(self.test_processor, self.test_owner, self.TEST_TIME)
@@ -189,13 +195,25 @@ class TestHelper:
             self.TEST_TIME_ENGLISH, self.TEST_USER_A, self.LEVEL_EXPECTED_A
         )
 
-    def user_calls_clear(self, username):
-        command = ClearCommand(self.test_processor, username)
+    def user_calls_clear(self, invoker, username):
+        command = ClearCommand(self.test_processor, invoker, username)
         response = self.test_processor.process_command(command)
         return (command, response)
 
-    def user_a_calls_clear(self):
-        return self.user_calls_clear(self.TEST_USER_A)
+    def user_a_calls_clear_no_args(self):
+        return self.user_calls_clear(self.TEST_USER_A, "")
+
+    def user_a_calls_clear_user(self, username_to_clear):
+        return self.user_calls_clear(self.TEST_USER_A, username_to_clear)
+
+    def user_a_calls_clear_user_a(self):
+        return self.user_a_calls_clear_user(self.TEST_USER_A)
+
+    def user_a_calls_clear_user_b(self):
+        return self.user_a_calls_clear_user(self.TEST_USER_B)
+
+    def user_a_calls_clear_user_c(self):
+        return self.user_a_calls_clear_user(self.TEST_USER_C)
 
     def user_calls_finish(self, user):
         command = FinishCommand(self.test_processor, user)
