@@ -11,6 +11,7 @@ from nullconstpointer.commands.random import RandomCommand
 from nullconstpointer.commands.leave import LeaveCommand
 from nullconstpointer.commands.list import ListCommand
 from nullconstpointer.commands.unmod import UnmodCommand
+from nullconstpointer.commands.timer import TimerCommand
 
 
 class TestHelper:
@@ -61,6 +62,9 @@ class TestHelper:
         self.LEVEL_INVALID_TWO = "aaa-aaa-aaa aaa aaa aai"
         self.LEVEL_INVALID_THREE_MIDDLE = "aaa-aaa-aaa bbb bbb bbi ccc ccc ccc"
         self.LEVEL_INVALID_THREE_MIDDLE_END = "aaa aaa aaa bbb bbb bbi ccc ccc cci"
+
+        self.TEST_TIME = "1"
+        self.TEST_TIME_ENGLISH = "1 minute"
 
     def owner_add_level(self, levelcode):
         command = AddCommand(
@@ -150,7 +154,7 @@ class TestHelper:
 
     def user_a_remove_level_b(self):
         return self.user_a_remove_level(self.LEVEL_INPUT_B)
-    
+
     def user_a_remove_level_none(self):
         return self.user_a_remove_level(None)
 
@@ -164,6 +168,26 @@ class TestHelper:
         command = ClearCommand(self.test_processor, self.test_owner)
         response = self.test_processor.process_command(command)
         return (command, response)
+
+    def owner_calls_timer(self):
+        command = TimerCommand(self.test_processor, self.test_owner, self.TEST_TIME)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def owner_calls_timer_no_args(self):
+        command = TimerCommand(self.test_processor, self.test_owner, None)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def user_a_calls_timer_no_args(self):
+        command = TimerCommand(self.test_processor, self.TEST_USER_A, None)
+        response = self.test_processor.process_command(command)
+        return (command, response)
+
+    def success_time_remaining_user_a_level_a(self, command):
+        return command.success_time_remaining(
+            self.TEST_TIME_ENGLISH, self.TEST_USER_A, self.LEVEL_EXPECTED_A
+        )
 
     def user_calls_clear(self, username):
         command = ClearCommand(self.test_processor, username)
