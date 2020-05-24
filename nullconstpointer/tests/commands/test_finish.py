@@ -59,7 +59,7 @@ class TestCommandFinish(unittest.TestCase):
     def test_current_has_correct_output_after_finish_same_user(self):
         self.test_helper.user_a_add_level_a()
         self.test_helper.user_a_add_level_b()
-        self.test_helper.owner_calls_next()
+        self.test_helper.owner_calls_next_no_args()
         self.test_helper.owner_calls_finish()
         command, response = self.test_helper.current_called()
 
@@ -68,7 +68,7 @@ class TestCommandFinish(unittest.TestCase):
     def test_current_has_correct_output_after_finish_different_user(self):
         self.test_helper.user_a_add_level_a()
         self.test_helper.user_b_add_level_b()
-        self.test_helper.owner_calls_next()
+        self.test_helper.owner_calls_next_no_args()
         self.test_helper.owner_calls_finish()
         command, response = self.test_helper.current_called()
 

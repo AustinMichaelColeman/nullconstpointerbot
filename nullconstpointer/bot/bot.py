@@ -82,7 +82,7 @@ class Bot(SingleServerIRCBot):
             self.username,
         )
 
-    def contains_invalid_characters(self, command):
+    def command_contains_invalid_characters(self, command):
         return re.search("([^A-Za-z])+", command) is not None
 
     def on_welcome(self, cxn, event):
@@ -110,7 +110,7 @@ class Bot(SingleServerIRCBot):
             cmd = message.split(" ")[0][len(self.prefix) :]
             cmd = cmd.lower()
             args = message.split(" ")[1:]
-            if self.contains_invalid_characters(cmd):
+            if self.command_contains_invalid_characters(cmd):
                 self.send_message(self.unregistered_command(user, cmd))
             elif cmd in self.mod_cmds.keys():
                 self.perform(user, self.mod_cmds[cmd], *args)
@@ -163,7 +163,8 @@ class Bot(SingleServerIRCBot):
         self.send_message(response)
 
     def next_level(self, chatuser, *args):
-        command = NextCommand(self.cmdprocessor, chatuser)
+        argstr = self.args_to_arg_str(args)
+        command = NextCommand(self.cmdprocessor, chatuser, argstr)
         response = self.cmdprocessor.process_command(command)
         self.send_message(response)
 

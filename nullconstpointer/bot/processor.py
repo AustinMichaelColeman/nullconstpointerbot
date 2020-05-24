@@ -38,9 +38,15 @@ class Processor:
             level_count += len(user.levels)
         return level_count
 
+    def find_user_with_level(self, user_to_find):
+        for user in self.users:
+            if user == user_to_find and user.has_levels():
+                return user
+        return None
+
     def find_first_user_with_level(self):
         for user in self.users:
-            if len(user.levels) > 0:
+            if user.has_levels():
                 return user
         return None
 

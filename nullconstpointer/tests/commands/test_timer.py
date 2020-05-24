@@ -9,7 +9,7 @@ class TestCommandTimer(unittest.TestCase):
 
     def test_non_owner_with_timer_set(self):
         self.test_helper.user_a_add_level_a()
-        self.test_helper.owner_calls_next()
+        self.test_helper.owner_calls_next_no_args()
         self.test_helper.owner_calls_timer()
         command, response = self.test_helper.owner_calls_timer_no_args()
 
@@ -19,14 +19,14 @@ class TestCommandTimer(unittest.TestCase):
 
     def test_non_owner_with_timer_not_set(self):
         self.test_helper.user_a_add_level_a()
-        self.test_helper.owner_calls_next()
+        self.test_helper.owner_calls_next_no_args()
         command, response = self.test_helper.user_a_calls_timer_no_args()
 
         self.assertEqual(response, command.fail_timer_not_set())
 
     def test_owner_with_timer_set(self):
         self.test_helper.user_a_add_level_a()
-        self.test_helper.owner_calls_next()
+        self.test_helper.owner_calls_next_no_args()
         self.test_helper.owner_calls_timer()
         command, response = self.test_helper.owner_calls_timer()
 
@@ -36,7 +36,7 @@ class TestCommandTimer(unittest.TestCase):
 
     def test_owner_with_timer_not_set(self):
         self.test_helper.user_a_add_level_a()
-        self.test_helper.owner_calls_next()
+        self.test_helper.owner_calls_next_no_args()
         command, response = self.test_helper.owner_calls_timer()
 
         self.assertEqual(response, command.success_starting_new_timer())
@@ -48,13 +48,13 @@ class TestCommandTimer(unittest.TestCase):
 
     def test_owner_calls_timer_no_args_with_level_set(self):
         self.test_helper.user_a_add_level_a()
-        self.test_helper.owner_calls_next()
+        self.test_helper.owner_calls_next_no_args()
         command, response = self.test_helper.owner_calls_timer_no_args()
         self.assertEqual(response, command.fail_enter_a_timer_value())
 
     def test_timer_finish_calls_success_time_expired(self):
         self.test_helper.user_a_add_level_a()
-        self.test_helper.owner_calls_next()
+        self.test_helper.owner_calls_next_no_args()
         self.test_helper.owner_calls_timer()
         self.test_helper.test_processor.time_remaining = 0
         command, response = self.test_helper.owner_calls_timer_no_args()

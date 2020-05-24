@@ -231,13 +231,16 @@ class TestHelper:
     def user_a_calls_leave(self):
         return self.user_calls_leave(self.TEST_USER_A)
 
-    def user_calls_next(self, user):
-        command = NextCommand(self.test_processor, user)
+    def user_calls_next(self, invoker_user, next_user):
+        command = NextCommand(self.test_processor, invoker_user, next_user)
         response = self.test_processor.process_command(command)
         return (command, response)
 
-    def user_a_calls_next(self):
-        return self.user_calls_next(self.TEST_USER_A)
+    def user_a_calls_next_no_args(self):
+        return self.user_calls_next(self.TEST_USER_A, "")
+
+    def user_a_calls_next_user_b(self):
+        return self.user_calls_next(self.TEST_USER_A, self.TEST_USER_B)
 
     def owner_calls_mod(self, username):
         command = ModCommand(self.test_processor, self.test_owner, username)
@@ -291,10 +294,16 @@ class TestHelper:
     def owner_calls_mod_none(self):
         return self.owner_calls_mod(None)
 
-    def owner_calls_next(self):
-        command = NextCommand(self.test_processor, self.test_owner)
+    def owner_calls_next(self, next_user):
+        command = NextCommand(self.test_processor, self.test_owner, next_user)
         response = self.test_processor.process_command(command)
         return (command, response)
+
+    def owner_calls_next_no_args(self):
+        return self.owner_calls_next("")
+
+    def owner_calls_next_user_a(self):
+        return self.owner_calls_next(self.TEST_USER_A)
 
     def owner_calls_finish(self):
         command = FinishCommand(self.test_processor, self.test_owner)
