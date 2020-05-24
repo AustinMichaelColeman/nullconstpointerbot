@@ -18,10 +18,14 @@ class FinishCommand(ICommand):
         return "There are no levels currently selected."
 
     def fail_finish_no_permission(self, caller_name):
-        return f"{caller_name}, only the owner {self.processor.current_owner} can use !finish"
+        return f"{caller_name}, only the owner and mods can use !finish"
 
     def execute(self):
-        if self.caller_name != self.processor.current_owner:
+        found_user = self.processor.find_user(self.caller_name)
+        if not found_user:
+            return self.fail_finish_no_permission(self.caller_name)
+
+        if not found_user.is_mod_or_owner():
             return self.fail_finish_no_permission(self.caller_name)
 
         if self.processor.next_level() is None:
