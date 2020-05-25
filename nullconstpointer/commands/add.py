@@ -47,6 +47,13 @@ class AddCommand(ICommand):
         level_count = len(levels) + processed_user.levelCount()
         return level_count > self.processor.level_limit
 
+    def remove_duplicates(self, levels):
+        duplicates_removed = []
+        for level in levels:
+            if level not in duplicates_removed:
+                duplicates_removed.append(level)
+        return duplicates_removed
+
     def execute(self):
         levels = create_levels(self.levelcode)
 
@@ -61,6 +68,8 @@ class AddCommand(ICommand):
                     return self.fail_add_user_level_duplicate_code(
                         self.invoker_name, level, processed_user
                     )
+
+        levels = self.remove_duplicates(levels)
 
         foundUser = False
         for processed_user in self.processor.users:

@@ -176,3 +176,35 @@ class TestCommandAdd(unittest.TestCase):
                 self.test_helper.TEST_USER_A,
             ),
         )
+
+    def test_duplicate_multi_AA(self):
+        command, response = self.test_helper.user_a_add_code_duplicate_AA()
+        self.assertEqual(
+            response,
+            command.success_add_user_level(
+                self.test_helper.TEST_USER_A, self.test_helper.LEVEL_EXPECTED_A,
+            ),
+        )
+        self.assertEqual(self.test_helper.test_processor.level_count(), 1)
+
+    def test_duplicate_multi_ABB(self):
+        command, response = self.test_helper.user_a_add_code_duplicate_ABB()
+        self.assertEqual(
+            response,
+            command.success_add_user_level(
+                self.test_helper.TEST_USER_A,
+                self.test_helper.LEVEL_INPUT_MULTIPLE_AB_EXPECTED,
+            ),
+        )
+        self.assertEqual(self.test_helper.test_processor.level_count(), 2)
+
+    def test_duplicate_multi_ABA(self):
+        command, response = self.test_helper.user_a_add_code_duplicate_ABA()
+        self.assertEqual(
+            response,
+            command.success_add_user_level(
+                self.test_helper.TEST_USER_A,
+                self.test_helper.LEVEL_INPUT_MULTIPLE_AB_EXPECTED,
+            ),
+        )
+        self.assertEqual(self.test_helper.test_processor.level_count(), 2)

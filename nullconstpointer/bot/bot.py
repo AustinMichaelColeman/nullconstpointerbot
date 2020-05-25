@@ -64,6 +64,7 @@ class Bot(SingleServerIRCBot):
             "remove": self.remove,
             "random": self.random,
             "finish": self.finish,
+            "adduser": self.adduser,
         }
 
         url = f"https://api.twitch.tv/kraken/users?login={self.username}"
@@ -243,4 +244,17 @@ class Bot(SingleServerIRCBot):
         else:
             command = TimerCommand(self.cmdprocessor, username, None)
 
+        self.send_message(self.cmdprocessor.process_command(command))
+
+    def adduser(self, chatuser, *args):
+        invoker = chatuser
+        if not self.cmdprocessor.is_mod_or_owner(invoker):
+            self.send_message("!adduser can only be called by mods or the owner.")
+            return
+        if len(args) < 2:
+            self.send_message("!adduser requires username and levels to add")
+            return
+        level_submitter = args[0]
+        argstr = self.args_to_arg_str(args[1:])
+        command = AddCommand(self.cmdprocessor, invoker, level_submitter, argstr)
         self.send_message(self.cmdprocessor.process_command(command))

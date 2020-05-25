@@ -58,6 +58,10 @@ class TestHelper:
             "aaa aaa aaa bbb bbb bbb ccc ccc ccc ddd ddd ddd"
         )
 
+        self.LEVEL_INPUT_MULTIPLE_AA = "aaa aaa aaa aaa aaa aaa"
+        self.LEVEL_INPUT_MULTIPLE_ABB = "aaa aaa aaa bbb bbb bbb bbb bbb bbb"
+        self.LEVEL_INPUT_MULTIPLE_ABA = "aaa aaa aaa bbb bbb bbb aaa aaa aaa"
+
         self.LEVEL_INVALID_ONE = "abc-def-gh"
         self.LEVEL_INVALID_TWO = "aaa-aaa-aaa aaa aaa aai"
         self.LEVEL_INVALID_THREE_MIDDLE = "aaa-aaa-aaa bbb bbb bbi ccc ccc ccc"
@@ -110,6 +114,15 @@ class TestHelper:
 
     def user_a_add_invalid_code_three_middle_end(self):
         return self.user_a_add_level(self.LEVEL_INVALID_THREE_MIDDLE_END)
+
+    def user_a_add_code_duplicate_AA(self):
+        return self.user_a_add_level(self.LEVEL_INPUT_MULTIPLE_AA)
+
+    def user_a_add_code_duplicate_ABB(self):
+        return self.user_a_add_level(self.LEVEL_INPUT_MULTIPLE_ABB)
+
+    def user_a_add_code_duplicate_ABA(self):
+        return self.user_a_add_level(self.LEVEL_INPUT_MULTIPLE_ABA)
 
     def user_a_add_multiple_ab(self):
         return self.user_a_add_level(self.LEVEL_INPUT_MULTIPLE_AB)
